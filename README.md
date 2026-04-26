@@ -1,6 +1,10 @@
 # Connect 4 AI
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A local browser-based Connect 4 game with a depth-limited minimax opponent, alpha-beta pruning, heuristic evaluation, AI move explanations, replay controls, and headless validation.
+
+![Connect 4 AI gameplay preview](assets/connect4-ai-preview.png)
 
 ## Run the Game
 
@@ -36,6 +40,11 @@ node script.js --help
 - `script.js` - game logic, AI logic, Experiment Lab, and Node exports
 - `report.html` - technical HTML report
 - `headless-test.js` - optional Node-based validation runner
+- `assets/connect4-ai-preview.png` - README preview image
+
+## License
+
+This project is open source under the [MIT License](LICENSE).
 
 ## Generated Support Assets
 

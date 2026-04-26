@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect 4 AI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="game-panel" aria-labelledby="game-title">
+      <div class="top-bar">
+        <div>
+          <p class="eyebrow">Adversarial Search Lab</p>
+          <h1 id="game-title">Connect 4 AI</h1>
+        </div>
+        <a class="report-link" href="report.html">Report</a>
+      </div>
+
+      <div id="status" class="status" role="status" aria-live="polite">Your turn. Drop a red piece.</div>
+
+      <div class="board-wrap">
+        <div id="columnControls" class="column-controls" aria-label="Column selection"></div>
+        <div id="board" class="board" aria-label="Connect 4 board"></div>
+      </div>
+    </section>
+
+    <aside id="sidePanel" class="side-panel" aria-label="Game controls and AI statistics" data-active-view="game">
+      <div class="side-tabs" role="group" aria-label="Side panel view">
+        <button id="controlsTabButton" class="side-tab active" type="button">Controls</button>
+        <button id="replayTabButton" class="side-tab" type="button" disabled>Replay</button>
+      </div>
+
+      <div class="side-game-view">
+      <section class="controls-section">
+        <h2>Controls</h2>
+        <div class="control-card">
+          <label class="field">
+            <span>Yellow AI</span>
+            <select id="difficulty">
+              <option value="2">Easy: depth 2</option>
+              <option value="4" selected>Medium: depth 4</option>
+              <option value="5">Hard: depth 5</option>
+              <option value="6">Expert: depth 6</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="control-card accent-card">
+          <label class="switch-row">
+            <span>
+              <strong>Autopilot</strong>
+              <small>Let red AI play your turns. Turn it off anytime to take over.</small>
+            </span>
+            <input type="checkbox" id="redAiEnabled">
+            <span class="switch-ui" aria-hidden="true"></span>
+          </label>
+
+          <label class="field compact-field">
+            <span>Red AI</span>
+            <select id="redDifficulty">
+              <option value="2">Easy: depth 2</option>
+              <option value="4" selected>Medium: depth 4</option>
+              <option value="5">Hard: depth 5</option>
+              <option value="6">Expert: depth 6</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="control-card">
+          <label class="toggle">
+            <input type="checkbox" id="useAlphaBeta" checked>
+            <span>Alpha-beta pruning</span>
+          </label>
+
+          <label class="toggle">
+            <input type="checkbox" id="showStats" checked>
+            <span>Show AI stats</span>
+          </label>
+        </div>
+
+        <button id="resetButton" class="primary-button" type="button">Reset Game</button>
+      </section>
+
+      <section id="statsPanel" class="stats-section">
+        <h2>Last AI Move</h2>
+        <dl class="stats-grid">
+          <div>
+            <dt>Player</dt>
+            <dd id="statPlayer">Yellow</dd>
+          </div>
+          <div>
+            <dt>Algorithm</dt>
+            <dd id="statAlgorithm">Minimax + Alpha-Beta</dd>
+          </div>
+          <div>
+            <dt>Depth</dt>
+            <dd id="statDepth">4</dd>
+          </div>
+          <div>
+            <dt>Nodes</dt>
+            <dd id="statNodes">0</dd>
+          </div>
+          <div>
+            <dt>Move time</dt>
+            <dd id="statTime">0.000 s</dd>
+          </div>
+          <div>
+            <dt>Selected column</dt>
+            <dd id="statMove">-</dd>
+          </div>
+          <div class="wide-stat">
+            <dt>Move reason</dt>
+            <dd id="statReason">Waiting for the next AI move.</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="experiment-section">
+        <h2>Experiment</h2>
+        <p>Compare minimax against alpha-beta and export evidence for the report.</p>
+        <div class="experiment-actions">
+          <button id="openExperimentButton" class="secondary-button" type="button">Open Experiment Lab</button>
+          <button id="createPdfButton" class="secondary-button" type="button">Create Report PDF</button>
+        </div>
+      </section>
+      </div>
+
+      <section id="replayPanel" class="replay-section side-replay-view" hidden>
+        <div class="section-heading-row">
+          <h2>Game Replay</h2>
+          <span id="replayCount" class="replay-count">0 / 0</span>
+        </div>
+        <div id="replayDescription" class="replay-description">Use the slider to review the game.</div>
+
+        <div id="replayMoveInsight" class="replay-move-insight" hidden>
+          <span class="insight-label">AI move reason</span>
+          <strong id="replayMoveReason">Review an AI move to see the search explanation.</strong>
+          <dl class="replay-insight-grid">
+            <div>
+              <dt>AI player</dt>
+              <dd id="replayInsightPlayer">-</dd>
+            </div>
+            <div>
+              <dt>Algorithm</dt>
+              <dd id="replayInsightAlgorithm">-</dd>
+            </div>
+            <div>
+              <dt>Depth</dt>
+              <dd id="replayInsightDepth">-</dd>
+            </div>
+            <div>
+              <dt>Paths explored</dt>
+              <dd id="replayInsightNodes">-</dd>
+            </div>
+            <div>
+              <dt>Thought time</dt>
+              <dd id="replayInsightTime">-</dd>
+            </div>
+            <div>
+              <dt>Search score</dt>
+              <dd id="replayInsightScore">-</dd>
+            </div>
+            <div class="wide-stat">
+              <dt>Equal best moves</dt>
+              <dd id="replayInsightTies">-</dd>
+            </div>
+          </dl>
+        </div>
+
+        <label class="field replay-field">
+          <span>Move Timeline</span>
+          <input id="replaySlider" class="replay-slider" type="range" min="0" max="0" value="0" step="1">
+        </label>
+
+        <div class="replay-actions">
+          <button id="replayPrevButton" class="secondary-button" type="button">Previous</button>
+          <button id="replayPlayButton" class="primary-button" type="button">Play</button>
+          <button id="replayNextButton" class="secondary-button" type="button">Next</button>
+        </div>
+
+        <label class="field replay-field">
+          <span>Playback Speed</span>
+          <input id="replaySpeed" class="replay-slider" type="range" min="150" max="1800" value="700" step="50">
+        </label>
+        <div class="replay-speed-row">
+          <span>Fast</span>
+          <strong id="replaySpeedLabel">0.70 s / move</strong>
+          <span>Slow</span>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <div id="experimentOverlay" class="modal-overlay" hidden>
+    <section class="experiment-modal" role="dialog" aria-modal="true" aria-labelledby="experimentTitle">
+      <header class="modal-header">
+        <div>
+          <p class="eyebrow">Search Evidence</p>
+          <h2 id="experimentTitle">Experiment Lab</h2>
+        </div>
+        <button id="closeExperimentButton" class="icon-button" type="button" aria-label="Close experiment lab">X</button>
+      </header>
+
+      <section class="experiment-controls" aria-label="Experiment setup controls">
+        <label class="field">
+          <span>Board Snapshot</span>
+          <select id="experimentBoardSource">
+            <option value="current">Current game position</option>
+            <option value="empty" selected>Empty starting board</option>
+            <option value="midgame">Prepared midgame test</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Benchmark Depths</span>
+          <select id="experimentMaxDepth">
+            <option value="3">Depths 2-3</option>
+            <option value="4">Depths 2-4</option>
+            <option value="5" selected>Depths 2-5</option>
+            <option value="6">Depths 2-6 (slower)</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Validation Games</span>
+          <select id="experimentValidationGames">
+            <option value="1">1 game</option>
+            <option value="2" selected>2 games</option>
+            <option value="4">4 games</option>
+            <option value="6">6 games</option>
+          </select>
+        </label>
+
+        <label class="toggle experiment-toggle">
+          <input type="checkbox" id="experimentTieVariation" checked>
+          <span>Tie variation checks</span>
+        </label>
+
+        <label class="toggle experiment-toggle">
+          <input type="checkbox" id="experimentMatchups" checked>
+          <span>AI matchup checks</span>
+        </label>
+      </section>
+
+      <div class="experiment-toolbar">
+        <button id="runExperimentButton" class="primary-button" type="button">Run Experiment</button>
+        <button id="downloadJsonButton" class="secondary-button" type="button" disabled>Download JSON</button>
+        <button id="downloadCsvButton" class="secondary-button" type="button" disabled>Download CSV</button>
+        <button id="downloadSummaryButton" class="secondary-button" type="button" disabled>Download Summary</button>
+      </div>
+
+      <div id="experimentProgress" class="experiment-progress" hidden>
+        <div class="progress-header">
+          <span id="experimentProgressLabel">Preparing experiment...</span>
+          <strong id="experimentProgressPercent">0%</strong>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <div id="experimentProgressFill" class="progress-fill"></div>
+        </div>
+      </div>
+
+      <div id="experimentSummary" class="experiment-summary">
+        Run the experiment to compare node counts, runtime, selected moves, and validation checks.
+      </div>
+
+      <div class="verification-note">
+        <h3>What This Helps Verify</h3>
+        <ul>
+          <li>Alpha-beta pruning returns the same minimax move and score.</li>
+          <li>Alpha-beta searches fewer or equal nodes than plain minimax.</li>
+          <li>Core game rules and win/draw detection pass repeatable checks.</li>
+          <li>Different search depths change AI strength in expected matchup tests.</li>
+        </ul>
+      </div>
+
+      <div class="experiment-kpis" id="experimentKpis" aria-label="Experiment summary metrics"></div>
+
+      <div class="proof-grid" id="proofGrid" aria-label="Validation checks"></div>
+
+      <section class="lab-section">
+        <h3>Validation Checks</h3>
+        <div id="validationRows" class="validation-list">
+          <div>Run the experiment to populate validation evidence.</div>
+        </div>
+      </section>
+
+      <section class="lab-section">
+        <h3>AI Matchup Sanity Checks</h3>
+        <div id="matchupRows" class="matchup-list">
+          <div>Run the experiment to compare easy-vs-expert AI matchups.</div>
+        </div>
+      </section>
+
+      <section class="lab-section">
+        <h3>Minimax vs Alpha-Beta Results</h3>
+      <div class="table-wrap modal-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Algorithm</th>
+              <th>Depth</th>
+              <th>Nodes</th>
+              <th>Time</th>
+              <th>Move</th>
+              <th>Score</th>
+              <th>Proof</th>
+            </tr>
+          </thead>
+          <tbody id="benchmarkRows">
+            <tr>
+              <td colspan="7">No experiment run yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      </section>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

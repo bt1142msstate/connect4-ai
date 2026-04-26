@@ -1,0 +1,13 @@
+.DS_Store
+Thumbs.db
+
+# Generated packaged artifacts
+deliverables/
+evidence/
+docs/
+
+# Local experiment exports
+*.csv
+*.json
+*.log
+*.out

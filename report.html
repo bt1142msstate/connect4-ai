@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect 4 AI Report</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="report-body">
+  <main class="report-page">
+    <header class="report-hero">
+      <nav class="report-actions" aria-label="Report actions">
+        <a class="report-link" href="index.html">Back to Game</a>
+        <button id="createPdfButton" class="pdf-button" type="button">Create PDF</button>
+      </nav>
+
+      <p class="eyebrow">Adversarial Search Project</p>
+      <h1>Connect 4 AI Report</h1>
+      <p class="report-lede">
+        I built a local browser game that demonstrates depth-limited minimax, alpha-beta pruning, heuristic
+        evaluation, adjustable difficulty, Autopilot, experiments, and headless testing.
+      </p>
+
+      <div class="report-metrics" aria-label="Project summary">
+        <div>
+          <span>Game</span>
+          <strong>7 x 6 Connect 4</strong>
+        </div>
+        <div>
+          <span>Search</span>
+          <strong>Minimax</strong>
+        </div>
+        <div>
+          <span>Optimization</span>
+          <strong>Alpha-Beta</strong>
+        </div>
+        <div>
+          <span>Max UI Depth</span>
+          <strong>6 Ply</strong>
+        </div>
+      </div>
+    </header>
+
+    <section class="report-grid">
+      <article class="report-section span-2">
+        <h2>What I Built</h2>
+        <p>
+          I built a local browser-based Connect 4 game with a standard 7-column by 6-row board. Red is the
+          human side and yellow is the AI side. The app validates legal moves, prevents drops into full columns, applies
+          gravity to the lowest open row, detects horizontal, vertical, and both diagonal wins, detects natural draws,
+          and resets the game. It also includes red Autopilot with its own difficulty setting, a yellow AI opponent,
+          post-game replay controls, an Experiment Lab, downloadable experiment results, and a Node headless test runner.
+        </p>
+      </article>
+
+      <article class="report-section span-2">
+        <h2>Project Features</h2>
+        <div class="checklist-grid">
+          <div>Static site: <code>index.html</code>, <code>style.css</code>, and <code>script.js</code></div>
+          <div>7 x 6 board with gravity drops, legal move checks, reset, wins, and draws</div>
+          <div>Depth-limited minimax with yellow maximizing and red minimizing</div>
+          <div>Alpha-beta pruning with move, node, runtime, algorithm, and depth stats</div>
+          <div>Heuristic scoring for wins, threats, open spaces, and center control</div>
+          <div>Easy, Medium, Hard, and Expert settings for both AI sides</div>
+          <div>Experiment Lab with JSON, CSV, and text evidence exports</div>
+          <div>Headless Node tests for game rules, search behavior, and AI matchups</div>
+        </div>
+      </article>
+
+      <article class="report-section span-2">
+        <h2>How to Run</h2>
+        <p>
+          The game runs by opening <code>index.html</code>; no server or internet connection is required. Optional
+          validation runs with <code>node headless-test.js</code>. I also added CLI modes with
+          <code>node script.js --headless</code> and <code>node script.js --experiment</code> so the same search and
+          rule checks can run outside the browser.
+        </p>
+      </article>
+
+      <article class="report-section">
+        <h2>Minimax</h2>
+        <p>
+          Minimax searches future game states as a tree. Yellow is the maximizing player because it tries to choose the
+          highest score. Red is the minimizing player because it tries to reduce yellow's outcome.
+          Terminal scores use the required base values, then add a small depth adjustment: yellow wins score
+          <code>+100000 + remaining depth</code>, red wins score <code>-100000 - remaining depth</code>, and draws
+          score <code>0</code>. This makes the AI prefer quicker wins and delay unavoidable losses.
+        </p>
+      </article>
+
+      <article class="report-section">
+        <h2>Alpha-Beta</h2>
+        <p>
+          Alpha-beta pruning keeps the same minimax result while avoiding branches that cannot affect the final move.
+          Alpha tracks the best score available to the maximizing player; beta tracks the best score available to the
+          minimizing player. When alpha is at least beta, the rest of that branch cannot change the chosen move.
+        </p>
+      </article>
+
+      <article class="report-section span-2">
+        <h2>Search Details</h2>
+        <div class="algorithm-grid">
+          <div>
+            <strong>State</strong>
+            <span>A board position, current player, depth remaining, alpha, and beta.</span>
+          </div>
+          <div>
+            <strong>Successors</strong>
+            <span>Each legal column creates one child board after gravity places the piece.</span>
+          </div>
+          <div>
+            <strong>Backup Rule</strong>
+            <span>Yellow keeps the highest child value; red keeps the lowest child value.</span>
+          </div>
+          <div>
+            <strong>Cutoff</strong>
+            <span>Stop at wins, losses, draws, depth zero, or when alpha reaches beta.</span>
+          </div>
+        </div>
+        <p>
+          With up to seven legal columns, plain minimax grows near <code>O(7^d)</code> before the board starts filling.
+          Alpha-beta has the same final choice as minimax, but good move ordering lets it skip many branches. I order
+          moves from the center outward because center columns are usually stronger in Connect 4 and also improve pruning.
+        </p>
+      </article>
+
+      <article class="report-section span-2">
+        <h2>Heuristic Evaluation</h2>
+        <div class="heuristic-list">
+          <div><span>Yellow four in a row</span><strong>+100000 base</strong></div>
+          <div><span>Red four in a row</span><strong>-100000 base</strong></div>
+          <div><span>Yellow three plus open space</span><strong>+100</strong></div>
+          <div><span>Red three plus open space</span><strong>-120</strong></div>
+          <div><span>Yellow two plus open spaces</span><strong>+10</strong></div>
+          <div><span>Red two plus open spaces</span><strong>-15</strong></div>
+          <div><span>Center-column control</span><strong>Bonus</strong></div>
+        </div>
+        <p>
+          Center control matters because center pieces participate in more possible winning lines. This static
+          evaluation estimates position quality when the depth limit is reached.
+        </p>
+      </article>
+
+      <article class="report-section span-2">
+        <h2>Experiment Results</h2>
+        <p>
+          These measurements were taken from the empty starting board. Times vary by browser and computer, but the main
+          result is stable: alpha-beta finds the same move while searching fewer nodes.
+        </p>
+        <div class="table-wrap report-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Algorithm</th>
+                <th>Depth</th>
+                <th>Measured Nodes</th>
+                <th>Measured Time</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Minimax</td>
+                <td>3</td>
+                <td>400</td>
+                <td>0.0054 s</td>
+                <td>Baseline, selected column 4</td>
+              </tr>
+              <tr>
+                <td>Alpha-Beta</td>
+                <td>3</td>
+                <td>82</td>
+                <td>0.0006 s</td>
+                <td>Same move, fewer nodes</td>
+              </tr>
+              <tr>
+                <td>Minimax</td>
+                <td>4</td>
+                <td>2,801</td>
+                <td>0.0125 s</td>
+                <td>Much slower as depth grows</td>
+              </tr>
+              <tr>
+                <td>Alpha-Beta</td>
+                <td>4</td>
+                <td>234</td>
+                <td>0.0006 s</td>
+                <td>More practical</td>
+              </tr>
+              <tr>
+                <td>Alpha-Beta</td>
+                <td>5</td>
+                <td>1,268</td>
+                <td>0.0034 s</td>
+                <td>Stronger AI at acceptable runtime</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="report-section span-2">
+        <h2>Testing and Validation</h2>
+        <p>
+          I tested the project with the browser game and the headless Node runner. The automated checks verify legal
+          moves, invalid-column rejection, gravity stacking, full-column rejection, center-first move ordering,
+          horizontal wins, vertical wins, diagonal wins, full-board draw detection, immediate threat detection, red's
+          minimizing choices, depth-adjusted terminal scoring, plain minimax versus alpha-beta consistency,
+          equal-score move variation, and uneven-depth AI matchups such as red depth 2 against yellow depth 6. The CLI
+          can also save experiment results as JSON, CSV, or a text summary using <code>--format</code> and
+          <code>--out</code>.
+        </p>
+      </article>
+
+      <article class="report-section span-2">
+        <h2>Testing Commands</h2>
+        <div class="command-list">
+          <code>node headless-test.js</code>
+          <code>node script.js --headless --red-depth=2 --yellow-depth=6 --games=6 --format=summary</code>
+          <code>node script.js --experiment --board=midgame --max-depth=6 --format=csv --out=experiment.csv</code>
+        </div>
+      </article>
+
+      <article class="report-section span-2">
+        <h2>What I Learned</h2>
+        <p>
+          Increasing search depth usually improves decision quality because the AI sees more future threats, but it
+          also grows the game tree quickly. Alpha-beta pruning makes deeper search practical by removing branches that
+          cannot affect the minimax choice. The heuristic matters because it guides the AI whenever the depth limit
+          stops before a win, loss, or draw.
+        </p>
+      </article>
+    </section>
+  </main>
+  <script>
+    function createReportPdf() {
+      window.print();
+    }
+
+    document.getElementById("createPdfButton").addEventListener("click", createReportPdf);
+
+    if (new URLSearchParams(window.location.search).get("print") === "1") {
+      window.addEventListener("load", () => {
+        window.setTimeout(createReportPdf, 250);
+      });
+    }
+  </script>
+</body>
+</html>

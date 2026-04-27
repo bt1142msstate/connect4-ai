@@ -370,23 +370,23 @@ function explainComputerMove(stateBeforeMove, result) {
   let reason;
 
   if (winsNow) {
-    reason = `${playerName} AI chose column ${selectedColumn} because it immediately completes four in a row.`;
+    reason = `${playerName} AI chose column ${selectedColumn} to finish four in a row immediately.`;
   } else if (opponentThreats.includes(result.move)) {
     reason = opponentThreats.length > 1
-      ? `${playerName} AI chose column ${selectedColumn} to block one of ${opponentName}'s immediate winning threats in columns ${formatColumns(opponentThreats)} after depth-${result.depth} minimax evaluated the replies.`
-      : `${playerName} AI chose column ${selectedColumn} to block ${opponentName}'s immediate winning threat after depth-${result.depth} minimax evaluated the replies.`;
+      ? `${playerName} AI chose column ${selectedColumn} to block ${opponentName}'s immediate threats in columns ${formatColumns(opponentThreats)}; depth-${result.depth} search checked replies.`
+      : `${playerName} AI chose column ${selectedColumn} to block ${opponentName}'s immediate winning threat; depth-${result.depth} search checked replies.`;
   } else if (opponentReplies.length > 0) {
-    reason = `${playerName} AI chose column ${selectedColumn} as the best depth-${result.depth} minimax option, but ${opponentName} still has an immediate reply threat in column ${formatColumns(opponentReplies)}.`;
+    reason = `${playerName} AI chose column ${selectedColumn} as the best depth-${result.depth} option, but ${opponentName} still has an immediate reply threat in column ${formatColumns(opponentReplies)}.`;
   } else if (createdThreats.length > 1) {
-    reason = `${playerName} AI chose column ${selectedColumn} because it creates multiple next-turn winning threats in columns ${formatColumns(createdThreats)}, with opponent replies considered by depth-${result.depth} minimax.`;
+    reason = `${playerName} AI chose column ${selectedColumn} to create multiple next-turn threats in columns ${formatColumns(createdThreats)} after checking replies.`;
   } else if (createdThreats.length === 1) {
-    reason = `${playerName} AI chose column ${selectedColumn} because it creates a next-turn threat in column ${formatColumns(createdThreats)} that the opponent can answer, and depth-${result.depth} minimax still rated it best.`;
+    reason = `${playerName} AI chose column ${selectedColumn} to create a next-turn threat in column ${formatColumns(createdThreats)}; depth-${result.depth} search still rated it best.`;
   } else if (tiedMoves.length > 1) {
-    reason = `${playerName} AI chose column ${selectedColumn} from equal depth-${result.depth} minimax choices: columns ${formatColumns(tiedMoves)}.`;
+    reason = `${playerName} AI chose column ${selectedColumn} from equal depth-${result.depth} best moves: columns ${formatColumns(tiedMoves)}.`;
   } else if (result.move === centerColumn) {
-    reason = `${playerName} AI chose the center column because center control contributes to more possible four-in-a-row lines in the depth-${result.depth} evaluation.`;
+    reason = `${playerName} AI chose the center column because it supports the most possible four-in-a-row lines.`;
   } else {
-    reason = `${playerName} AI chose column ${selectedColumn} because it had the best depth-${result.depth} minimax evaluation from this position.`;
+    reason = `${playerName} AI chose column ${selectedColumn} because depth-${result.depth} minimax gave it the best score.`;
   }
 
   return {

@@ -608,7 +608,7 @@ select option {
 }
 
 .stats-grid .wide-stat {
-  min-height: 126px;
+  min-height: 156px;
 }
 
 dt {
@@ -634,13 +634,13 @@ dd {
 }
 
 #statReason {
-  height: 4.1rem;
+  height: 6.05rem;
   padding-right: 4px;
   font-size: 0.94rem;
 }
 
 #replayMoveReason {
-  height: 4.8rem;
+  height: 5.9rem;
   padding-right: 4px;
 }
 

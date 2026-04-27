@@ -765,7 +765,9 @@ function updateReplayMoveInsight() {
 
   const search = move.search;
   panel.hidden = false;
-  document.getElementById("replayMoveReason").textContent = search.reason;
+  const replayReason = document.getElementById("replayMoveReason");
+  replayReason.textContent = search.reason;
+  replayReason.title = search.reason;
   document.getElementById("replayInsightPlayer").textContent = `${formatPlayer(search.player)} AI`;
   document.getElementById("replayInsightAlgorithm").textContent = search.algorithm;
   document.getElementById("replayInsightDepth").textContent = search.depth;
@@ -1088,7 +1090,9 @@ function updateStats(result) {
   document.getElementById("statMove").textContent = result.move === null ? "-" : String(result.move + 1);
   const reason = document.getElementById("statReason");
   if (reason) {
-    reason.textContent = result.reason ?? "Waiting for the next AI move.";
+    const reasonText = result.reason ?? "Waiting for the next AI move.";
+    reason.textContent = reasonText;
+    reason.title = reasonText;
   }
 }
 

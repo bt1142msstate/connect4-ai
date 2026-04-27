@@ -1244,7 +1244,7 @@ function handleBoardClick(event) {
 
 function handleKeyboardDrop(event) {
   if (!/^[1-7]$/.test(event.key)) return;
-  if (isExperimentLabOpen()) return;
+  if (isExperimentLabOpen() || isWalkthroughOpen()) return;
   const activeTag = document.activeElement ? document.activeElement.tagName : "";
   if (activeTag === "INPUT" || activeTag === "SELECT" || activeTag === "TEXTAREA") return;
   const col = Number(event.key) - 1;
@@ -1279,6 +1279,21 @@ function closeExperimentLab() {
 
 function isExperimentLabOpen() {
   const overlay = document.getElementById("experimentOverlay");
+  return Boolean(overlay && !overlay.hidden);
+}
+
+function openWalkthrough() {
+  const overlay = document.getElementById("walkthroughOverlay");
+  overlay.hidden = false;
+  document.getElementById("closeWalkthroughButton").focus();
+}
+
+function closeWalkthrough() {
+  document.getElementById("walkthroughOverlay").hidden = true;
+}
+
+function isWalkthroughOpen() {
+  const overlay = document.getElementById("walkthroughOverlay");
   return Boolean(overlay && !overlay.hidden);
 }
 
@@ -1860,8 +1875,14 @@ function downloadExperimentSummary() {
 }
 
 function handleExperimentKeydown(event) {
-  if (event.key === "Escape" && isExperimentLabOpen()) {
+  if (event.key !== "Escape") {
+    return;
+  }
+
+  if (isExperimentLabOpen()) {
     closeExperimentLab();
+  } else if (isWalkthroughOpen()) {
+    closeWalkthrough();
   }
 }
 
@@ -1894,6 +1915,8 @@ function initBrowserGame() {
   document.getElementById("redAiEnabled").addEventListener("change", handleRedAiToggle);
   document.getElementById("showStats").addEventListener("change", toggleStats);
   document.getElementById("createPdfButton").addEventListener("click", createReportPdf);
+  document.getElementById("openWalkthroughButton").addEventListener("click", openWalkthrough);
+  document.getElementById("closeWalkthroughButton").addEventListener("click", closeWalkthrough);
   document.getElementById("openExperimentButton").addEventListener("click", openExperimentLab);
   document.getElementById("closeExperimentButton").addEventListener("click", closeExperimentLab);
   document.getElementById("runExperimentButton").addEventListener("click", runExperiment);
@@ -1917,6 +1940,9 @@ function initBrowserGame() {
   }
   document.getElementById("experimentOverlay").addEventListener("click", (event) => {
     if (event.target.id === "experimentOverlay") closeExperimentLab();
+  });
+  document.getElementById("walkthroughOverlay").addEventListener("click", (event) => {
+    if (event.target.id === "walkthroughOverlay") closeWalkthrough();
   });
   document.getElementById("difficulty").addEventListener("change", () => {
     if (document.getElementById("statPlayer").textContent === "Yellow") {

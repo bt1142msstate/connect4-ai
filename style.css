@@ -127,6 +127,13 @@ select {
   gap: 16px;
 }
 
+.top-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .eyebrow {
   margin: 0 0 6px;
   color: var(--felt);
@@ -163,6 +170,23 @@ h2 {
   text-decoration: none;
   font-weight: 700;
   box-shadow: 0 12px 24px rgba(28, 109, 194, 0.24);
+}
+
+.top-action-button {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 0 15px;
+  border: 1px solid rgba(75, 163, 255, 0.28);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(35, 52, 78, 0.96), rgba(20, 32, 52, 0.96));
+  color: #dceeff;
+  cursor: pointer;
+  font-weight: 800;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.top-action-button:hover {
+  background: linear-gradient(180deg, rgba(45, 68, 102, 0.98), rgba(25, 42, 68, 0.98));
 }
 
 .report-link:focus-visible,
@@ -848,7 +872,8 @@ th {
   display: none;
 }
 
-.experiment-modal {
+.experiment-modal,
+.walkthrough-modal {
   width: min(1040px, 100%);
   max-height: min(86vh, 820px);
   overflow: auto;
@@ -859,6 +884,10 @@ th {
     linear-gradient(180deg, rgba(20, 31, 49, 0.98), rgba(8, 13, 24, 0.98)),
     var(--panel);
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.52);
+}
+
+.walkthrough-modal {
+  width: min(1060px, 100%);
 }
 
 .modal-header {
@@ -887,6 +916,94 @@ th {
 
 .icon-button:hover {
   background: rgba(255, 255, 255, 0.12);
+}
+
+.walkthrough-flow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 14px;
+  border: 1px solid rgba(45, 212, 191, 0.22);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(45, 212, 191, 0.08), rgba(255, 255, 255, 0.035)),
+    rgba(9, 18, 30, 0.82);
+}
+
+.walkthrough-flow div {
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid rgba(75, 163, 255, 0.16);
+  border-radius: 9px;
+  background: rgba(7, 13, 24, 0.44);
+}
+
+.walkthrough-flow strong,
+.walkthrough-flow span {
+  display: block;
+}
+
+.walkthrough-flow strong {
+  margin-bottom: 5px;
+  color: var(--ink);
+}
+
+.walkthrough-flow span {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.walkthrough-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.walkthrough-card {
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(21, 32, 50, 0.92), rgba(9, 16, 28, 0.92)),
+    rgba(255, 255, 255, 0.035);
+}
+
+.walkthrough-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 26px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(45, 212, 191, 0.28);
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.1);
+  color: var(--felt);
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.walkthrough-card h3 {
+  margin: 0 0 8px;
+  color: var(--ink);
+}
+
+.walkthrough-card p {
+  margin: 0 0 12px;
+  color: #c9d7e8;
+  line-height: 1.48;
+}
+
+.walkthrough-card code {
+  display: block;
+  overflow-wrap: anywhere;
+  padding: 8px 9px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+  font-weight: 800;
 }
 
 .experiment-toolbar {
@@ -1443,7 +1560,8 @@ th {
   .algorithm-grid,
   .experiment-controls,
   .replay-insight-grid,
-  .proof-grid {
+  .proof-grid,
+  .walkthrough-flow {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -1466,7 +1584,13 @@ th {
     flex-direction: column;
   }
 
-  .report-link {
+  .top-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .report-link,
+  .top-action-button {
     text-align: center;
   }
 
@@ -1502,7 +1626,9 @@ th {
   .heuristic-list,
   .checklist-grid,
   .experiment-controls,
-  .proof-grid {
+  .proof-grid,
+  .walkthrough-flow,
+  .walkthrough-grid {
     grid-template-columns: 1fr;
   }
 

@@ -232,7 +232,20 @@
             The board is a 6 by 7 array where <code>0</code> is empty, <code>1</code> is red, and
             <code>2</code> is yellow. Drops scan from the bottom row upward so every piece lands in the lowest open cell.
           </p>
-          <code>createBoard(), getLegalMoves(), dropPiece()</code>
+          <div class="function-list"><code>createBoard()</code><code>getLegalMoves()</code><code>dropPiece()</code></div>
+          <details class="code-details">
+            <summary>Show key code</summary>
+            <pre><code>function createBoard() {
+  return Array.from({ length: ROWS }, () =&gt; Array(COLS).fill(EMPTY));
+}
+
+function dropPiece(state, col, player) {
+  const row = getOpenRow(state, col);
+  if (row === -1) return null;
+  state[row][col] = player;
+  return row;
+}</code></pre>
+          </details>
         </article>
 
         <article class="walkthrough-card">
@@ -242,7 +255,20 @@
             Every move checks legal columns, full columns, horizontal wins, vertical wins, both diagonal directions,
             and natural draws. The same rule functions are used by the browser and the headless test runner.
           </p>
-          <code>checkWin(), isDraw(), getWinner()</code>
+          <div class="function-list"><code>checkWin()</code><code>isDraw()</code><code>getWinner()</code></div>
+          <details class="code-details">
+            <summary>Show key code</summary>
+            <pre><code>function checkWin(state, player) {
+  const directions = [[0, 1], [1, 0], [1, 1], [-1, 1]];
+  // Scan every cell and count four matching pieces in each direction.
+}
+
+function isDraw(state) {
+  return getLegalMoves(state).length === 0
+    &amp;&amp; !checkWin(state, HUMAN).won
+    &amp;&amp; !checkWin(state, AI).won;
+}</code></pre>
+          </details>
         </article>
 
         <article class="walkthrough-card">
@@ -252,7 +278,18 @@
             Yellow is the maximizing player and red is the minimizing player. Search stops at terminal positions or the
             selected depth limit, then backs scores up through the game tree.
           </p>
-          <code>minimax(), chooseComputerMove()</code>
+          <div class="function-list"><code>minimax()</code><code>chooseComputerMove()</code></div>
+          <details class="code-details">
+            <summary>Show key code</summary>
+            <pre><code>function minimax(state, depth, alpha, beta, maximizingPlayer, useAlphaBeta, stats) {
+  const legalMoves = orderMoves(getLegalMoves(state));
+  if (terminal) return { column: null, score: getTerminalScore(...) };
+  if (depth &lt;= 0) return { column: null, score: evaluateBoard(state) };
+
+  // MAX chooses the highest child score.
+  // MIN chooses the lowest child score.
+}</code></pre>
+          </details>
         </article>
 
         <article class="walkthrough-card">
@@ -262,7 +299,19 @@
             Alpha-beta keeps the same minimax choice while skipping branches that cannot change the result. Moves are
             searched from the center outward because stronger early moves usually improve pruning.
           </p>
-          <code>orderMoves(), alpha, beta</code>
+          <div class="function-list"><code>orderMoves()</code><code>alpha</code><code>beta</code></div>
+          <details class="code-details">
+            <summary>Show key code</summary>
+            <pre><code>function orderMoves(moves) {
+  const center = Math.floor(COLS / 2);
+  return moves.slice().sort((a, b) =&gt; Math.abs(a - center) - Math.abs(b - center));
+}
+
+if (useAlphaBeta) {
+  alpha = Math.max(alpha, value);
+  if (alpha &gt;= beta) break;
+}</code></pre>
+          </details>
         </article>
 
         <article class="walkthrough-card">
@@ -272,7 +321,16 @@
             When the depth limit is reached, the evaluation scores four-cell windows, center control, immediate wins,
             threats, and defensive blocks. Terminal scores prefer quicker wins and delay losses.
           </p>
-          <code>evaluateBoard(), scoreWindow()</code>
+          <div class="function-list"><code>evaluateBoard()</code><code>scoreWindow()</code></div>
+          <details class="code-details">
+            <summary>Show key code</summary>
+            <pre><code>function scoreWindow(windowCells) {
+  if (aiCount === 4) return 100000;
+  if (humanCount === 4) return -100000;
+  if (aiCount === 3 &amp;&amp; emptyCount === 1) return 100;
+  if (humanCount === 3 &amp;&amp; emptyCount === 1) return -120;
+}</code></pre>
+          </details>
         </article>
 
         <article class="walkthrough-card">
@@ -282,7 +340,18 @@
             Each AI move stores depth, nodes searched, time, score, and a short reason. Replay uses the move history,
             while the Experiment Lab and Node runner reuse the same search code for repeatable checks.
           </p>
-          <code>recordMove(), runHeadlessSuite()</code>
+          <div class="function-list"><code>recordMove()</code><code>runHeadlessSuite()</code></div>
+          <details class="code-details">
+            <summary>Show key code</summary>
+            <pre><code>function recordMove(row, col, player, metadata = {}) {
+  moveHistory.push({ row, col, player, ...metadata });
+  replayStep = moveHistory.length;
+}
+
+function runHeadlessSuite(options = {}) {
+  // Reuses the same rules and search functions outside the browser.
+}</code></pre>
+          </details>
         </article>
       </div>
     </section>

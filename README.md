@@ -10,7 +10,7 @@ A local browser-based Connect 4 game with a depth-limited minimax opponent, alph
 
 Open `index.html` in a browser. No server or package install is required for gameplay.
 After a game ends, the side panel's Replay tab lets you scrub through every move, step backward or forward one move at a time, or play the whole game back at a selected speed. AI moves include the reason, depth, algorithm, nodes searched, score, and move time.
-Use the How It Works button for an in-app walkthrough of the board model, rules, minimax search, pruning, heuristic, and validation flow.
+Use the How It Works button for an in-app walkthrough of the board model, rules, minimax search, pruning, heuristic, and validation flow. Each walkthrough card includes an expandable code snippet for the relevant functions.
 
 ## Report
 

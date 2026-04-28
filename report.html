@@ -56,7 +56,7 @@
       <article class="report-section span-2">
         <h2>Project Features</h2>
         <div class="checklist-grid">
-          <div>Static site: <code>index.html</code>, <code>style.css</code>, and <code>script.js</code></div>
+          <div>Static site with separated engine/UI JavaScript files</div>
           <div>7 x 6 board with gravity drops, legal move checks, reset, wins, and draws</div>
           <div>Depth-limited minimax with yellow maximizing and red minimizing</div>
           <div>Alpha-beta pruning with move, node, runtime, algorithm, and depth stats</div>
@@ -71,9 +71,9 @@
         <h2>How to Run</h2>
         <p>
           The game runs by opening <code>index.html</code>; no server or internet connection is required. Optional
-          validation runs with <code>node headless-test.js</code>. I also added CLI modes with
-          <code>node script.js --headless</code> and <code>node script.js --experiment</code> so the same search and
-          rule checks can run outside the browser.
+          validation runs with <code>node headless-test.js</code>. The reusable board rules and AI search live in
+          <code>connect4-engine.js</code>, while <code>script.js</code> handles the browser UI, replay, Experiment Lab,
+          and CLI modes.
         </p>
       </article>
 

@@ -343,9 +343,11 @@ if (useAlphaBeta) {
           <div class="function-list"><code>recordMove()</code><code>runHeadlessSuite()</code></div>
           <details class="code-details">
             <summary>Show key code</summary>
-            <pre><code>function recordMove(row, col, player, metadata = {}) {
-  moveHistory.push({ row, col, player, ...metadata });
-  replayStep = moveHistory.length;
+            <pre><code>function createReplayController(options = {}) {
+  let moveHistory = [];
+  function recordMove(row, col, player, metadata = {}) {
+    moveHistory.push({ row, col, player, ...metadata });
+  }
 }
 
 function runHeadlessSuite(options = {}) {
@@ -486,6 +488,7 @@ function runHeadlessSuite(options = {}) {
   <script src="connect4-engine.js"></script>
   <script src="connect4-experiment.js"></script>
   <script src="connect4-experiment-ui.js"></script>
+  <script src="connect4-replay-ui.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

@@ -10,6 +10,10 @@ const Connect4ExperimentUi = typeof module !== "undefined" && module.exports
   ? null
   : globalThis.Connect4ExperimentUi;
 
+const Connect4ReplayUi = typeof module !== "undefined" && module.exports
+  ? null
+  : globalThis.Connect4ReplayUi;
+
 const {
   ROWS,
   COLS,
@@ -35,7 +39,6 @@ const {
   withComputerMoveExplanation,
   createSearchSnapshot,
   formatColumns,
-  formatPlayer,
   formatNumber,
   formatSeconds
 } = Connect4Engine;
@@ -62,11 +65,7 @@ let currentPlayer = HUMAN;
 let pendingComputerTimeout = null;
 let hoverColumn = null;
 let experimentLab = null;
-let moveHistory = [];
-let replayStep = 0;
-let replayTimer = null;
-let finalStatusMessage = "";
-let sidePanelView = "game";
+let replayController = null;
 
 function setStatus(message) {
   const status = document.getElementById("status");
@@ -74,191 +73,21 @@ function setStatus(message) {
 }
 
 function recordMove(row, col, player, metadata = {}) {
-  moveHistory.push({ row, col, player, ...metadata });
-  replayStep = moveHistory.length;
-}
-
-function buildBoardFromMoves(step) {
-  const replayBoard = createBoard();
-  for (const move of moveHistory.slice(0, step)) {
-    dropPiece(replayBoard, move.col, move.player);
-  }
-  return replayBoard;
-}
-
-function stopReplayPlayback() {
-  if (replayTimer !== null) {
-    window.clearTimeout(replayTimer);
-    replayTimer = null;
-  }
-  const playButton = document.getElementById("replayPlayButton");
-  if (playButton) playButton.textContent = "Play";
-}
-
-function getReplaySpeedMs() {
-  const speed = document.getElementById("replaySpeed");
-  return speed ? Number(speed.value) : 700;
-}
-
-function updateReplaySpeedLabel() {
-  const label = document.getElementById("replaySpeedLabel");
-  if (!label) return;
-  label.textContent = `${(getReplaySpeedMs() / 1000).toFixed(2)} s / move`;
-}
-
-function getReplayDescription() {
-  if (moveHistory.length === 0) {
-    return "No completed game to replay yet.";
-  }
-  if (replayStep === 0) {
-    return `Move 0 of ${moveHistory.length}: empty board before the first drop.`;
-  }
-
-  const move = moveHistory[replayStep - 1];
-  const player = move.search ? `${formatPlayer(move.player)} AI` : formatPlayer(move.player);
-  const moveText = `Move ${replayStep} of ${moveHistory.length}: ${player} dropped in column ${move.col + 1}.`;
-  if (replayStep === moveHistory.length && finalStatusMessage) {
-    return `${moveText} Final position: ${finalStatusMessage}`;
-  }
-  return moveText;
-}
-
-function updateReplayMoveInsight() {
-  const panel = document.getElementById("replayMoveInsight");
-  if (!panel) return;
-
-  const move = replayStep > 0 ? moveHistory[replayStep - 1] : null;
-  if (!move || !move.search) {
-    panel.hidden = true;
-    return;
-  }
-
-  const search = move.search;
-  panel.hidden = false;
-  const replayReason = document.getElementById("replayMoveReason");
-  replayReason.textContent = search.reason;
-  replayReason.title = search.reason;
-  document.getElementById("replayInsightPlayer").textContent = `${formatPlayer(search.player)} AI`;
-  document.getElementById("replayInsightAlgorithm").textContent = search.algorithm;
-  document.getElementById("replayInsightDepth").textContent = search.depth;
-  document.getElementById("replayInsightNodes").textContent = formatNumber(search.nodes);
-  document.getElementById("replayInsightTime").textContent = formatSeconds(search.elapsed);
-  document.getElementById("replayInsightScore").textContent = search.scoreLabel;
-  document.getElementById("replayInsightTies").textContent = search.tiedMovesLabel;
-}
-
-function updateSidePanelView() {
-  const sidePanel = document.getElementById("sidePanel");
-  if (!sidePanel) return;
-
-  const canReplay = gameOver && moveHistory.length > 0;
-  if (!canReplay && sidePanelView === "replay") {
-    sidePanelView = "game";
-  }
-
-  sidePanel.dataset.activeView = sidePanelView;
-  const controlsButton = document.getElementById("controlsTabButton");
-  const replayButton = document.getElementById("replayTabButton");
-  if (controlsButton) controlsButton.classList.toggle("active", sidePanelView === "game");
-  if (replayButton) {
-    replayButton.classList.toggle("active", sidePanelView === "replay");
-    replayButton.disabled = !canReplay;
-    replayButton.title = canReplay ? "Review the completed game" : "Replay is available after a completed game";
-  }
-}
-
-function setSidePanelView(view) {
-  const canReplay = gameOver && moveHistory.length > 0;
-  sidePanelView = view === "replay" && canReplay ? "replay" : "game";
-  updateSidePanelView();
-}
-
-function updateReplayControls() {
-  const panel = document.getElementById("replayPanel");
-  if (!panel) return;
-  const hasMoves = moveHistory.length > 0;
-  panel.hidden = !gameOver || !hasMoves;
-  updateSidePanelView();
-  if (!gameOver || !hasMoves) {
-    updateReplayMoveInsight();
-    return;
-  }
-
-  const slider = document.getElementById("replaySlider");
-  const count = document.getElementById("replayCount");
-  const description = document.getElementById("replayDescription");
-  const prevButton = document.getElementById("replayPrevButton");
-  const nextButton = document.getElementById("replayNextButton");
-  slider.max = String(moveHistory.length);
-  slider.value = String(replayStep);
-  count.textContent = `${replayStep} / ${moveHistory.length}`;
-  description.textContent = getReplayDescription();
-  prevButton.disabled = replayStep <= 0;
-  nextButton.disabled = replayStep >= moveHistory.length;
-  updateReplayMoveInsight();
-  updateReplaySpeedLabel();
-}
-
-function showReplayStep(step, options = {}) {
-  if (!options.keepPlaying) {
-    stopReplayPlayback();
-  }
-  replayStep = Math.min(Math.max(Number(step), 0), moveHistory.length);
-  board = buildBoardFromMoves(replayStep);
-  const outcome = getWinner(board);
-  winningCells = outcome.winner === HUMAN || outcome.winner === AI ? outcome.cells : [];
-  renderBoard();
-  updateReplayControls();
-  setStatus(`Replay: ${getReplayDescription()}`);
-}
-
-function scheduleReplayAdvance() {
-  replayTimer = window.setTimeout(() => {
-    if (replayStep >= moveHistory.length) {
-      stopReplayPlayback();
-      return;
-    }
-    showReplayStep(replayStep + 1, { keepPlaying: true });
-    if (replayStep >= moveHistory.length) {
-      stopReplayPlayback();
-      return;
-    }
-    scheduleReplayAdvance();
-  }, getReplaySpeedMs());
-}
-
-function toggleReplayPlayback() {
-  if (moveHistory.length === 0) return;
-  if (replayTimer !== null) {
-    stopReplayPlayback();
-    return;
-  }
-  if (replayStep >= moveHistory.length) {
-    showReplayStep(0, { keepPlaying: true });
-  }
-  document.getElementById("replayPlayButton").textContent = "Pause";
-  scheduleReplayAdvance();
+  if (replayController) replayController.recordMove(row, col, player, metadata);
 }
 
 function finishGame(message, cells = []) {
   gameOver = true;
   isAiThinking = false;
   winningCells = cells;
-  finalStatusMessage = message;
-  replayStep = moveHistory.length;
-  stopReplayPlayback();
+  if (replayController) replayController.finishGame(message);
   setStatus(message);
   renderBoard();
-  updateReplayControls();
+  if (replayController) replayController.updateControls();
 }
 
 function resetReplay() {
-  stopReplayPlayback();
-  moveHistory = [];
-  replayStep = 0;
-  finalStatusMessage = "";
-  sidePanelView = "game";
-  updateReplayControls();
+  if (replayController) replayController.reset();
 }
 
 function renderBoard(options = {}) {
@@ -672,6 +501,17 @@ function initBrowserGame() {
     getCurrentBoard: () => board,
     getCurrentPlayer: () => currentPlayer
   });
+  replayController = Connect4ReplayUi.createReplayController({
+    getGameOver: () => gameOver,
+    setBoard: (nextBoard) => {
+      board = nextBoard;
+    },
+    setWinningCells: (cells) => {
+      winningCells = cells;
+    },
+    renderBoard,
+    setStatus
+  });
 
   createColumnControls();
   renderBoard();
@@ -692,20 +532,13 @@ function initBrowserGame() {
   document.addEventListener("keydown", handleExperimentKeydown);
 
   document.getElementById("resetButton").addEventListener("click", resetGame);
-  document.getElementById("controlsTabButton").addEventListener("click", () => setSidePanelView("game"));
-  document.getElementById("replayTabButton").addEventListener("click", () => setSidePanelView("replay"));
   document.getElementById("redAiEnabled").addEventListener("change", handleRedAiToggle);
   document.getElementById("showStats").addEventListener("change", toggleStats);
   document.getElementById("createPdfButton").addEventListener("click", createReportPdf);
   document.getElementById("openWalkthroughButton").addEventListener("click", openWalkthrough);
   document.getElementById("closeWalkthroughButton").addEventListener("click", closeWalkthrough);
   experimentLab.bindEvents();
-  document.getElementById("replaySlider").addEventListener("input", (event) => showReplayStep(event.target.value));
-  document.getElementById("replayPrevButton").addEventListener("click", () => showReplayStep(replayStep - 1));
-  document.getElementById("replayNextButton").addEventListener("click", () => showReplayStep(replayStep + 1));
-  document.getElementById("replayPlayButton").addEventListener("click", toggleReplayPlayback);
-  document.getElementById("replaySpeed").addEventListener("input", updateReplaySpeedLabel);
-  updateReplayControls();
+  replayController.bindEvents();
   document.getElementById("walkthroughOverlay").addEventListener("click", (event) => {
     if (event.target.id === "walkthroughOverlay") closeWalkthrough();
   });

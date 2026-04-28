@@ -229,6 +229,42 @@
     return { column: bestColumn, score: value };
   }
 
+  function createTacticalRootResult(state, depth, useAlphaBeta, player, legalMoves, start) {
+    // Forced one-ply tactics do not need a full tree search: win now, or block the only immediate loss.
+    const orderedCurrentWins = orderMoves(getImmediateWinningMoves(state, player));
+    const opponent = getOpponent(player);
+    const orderedOpponentWins = orderMoves(getImmediateWinningMoves(state, opponent));
+    let move = null;
+    let score = null;
+    let tactical = null;
+
+    if (orderedCurrentWins.length > 0) {
+      move = orderedCurrentWins[0];
+      score = player === AI ? WIN_SCORE + depth : -WIN_SCORE - depth;
+      tactical = "win";
+    } else if (orderedOpponentWins.length === 1) {
+      move = orderedOpponentWins[0];
+      const next = copyBoard(state);
+      dropPiece(next, move, player);
+      score = evaluateBoard(next);
+      tactical = "block";
+    }
+
+    if (move === null) return null;
+
+    return {
+      move,
+      score,
+      depth,
+      nodes: legalMoves.length + 1,
+      elapsed: getNow() - start,
+      algorithm: useAlphaBeta ? "Minimax + Alpha-Beta" : "Plain Minimax",
+      player,
+      tiedMoves: [move],
+      tactical
+    };
+  }
+
   function chooseRootMove(state, depth, useAlphaBeta, player = AI, options = {}) {
     // Root search records the chosen move, score, timing, node count, and equal-score ties.
     const searchDepth = Math.max(0, depth);
@@ -241,6 +277,9 @@
     let tiedColumns = bestColumn === null ? [] : [bestColumn];
     let alpha = -Infinity;
     let beta = Infinity;
+
+    const tacticalResult = createTacticalRootResult(state, depth, useAlphaBeta, player, legalMoves, start);
+    if (tacticalResult) return tacticalResult;
 
     for (const col of legalMoves) {
       const next = copyBoard(state);
@@ -367,7 +406,9 @@
     if (winsNow) {
       reason = `${playerName} AI chose column ${selectedColumn} to finish four in a row immediately.`;
     } else if (opponentThreats.includes(result.move)) {
-      reason = opponentThreats.length > 1
+      reason = result.tactical === "block"
+        ? `${playerName} AI used a one-ply tactical check to block ${opponentName}'s immediate winning threat in column ${selectedColumn}.`
+        : opponentThreats.length > 1
         ? `${playerName} AI chose column ${selectedColumn} to block ${opponentName}'s immediate threats in columns ${formatColumns(opponentThreats)}; depth-${result.depth} search checked replies.`
         : `${playerName} AI chose column ${selectedColumn} to block ${opponentName}'s immediate winning threat; depth-${result.depth} search checked replies.`;
     } else if (opponentReplies.length > 0) {
@@ -408,6 +449,7 @@
       score: result.score,
       scoreLabel: result.scoreLabel,
       reason: result.reason,
+      tactical: result.tactical ?? null,
       tiedMoves: result.tiedMoves ?? [],
       tiedMovesLabel: result.tiedMovesLabel ?? "-"
     };
@@ -565,6 +607,21 @@
     checks.push({
       name: "red minimizer blocks an immediate yellow win",
       passed: chooseComputerMove(state, 4, useAlphaBeta, HUMAN, { randomizeTies: false }).move === 3
+    });
+
+    state = createBoard();
+    dropPiece(state, 0, HUMAN);
+    dropPiece(state, 1, HUMAN);
+    dropPiece(state, 2, HUMAN);
+    const tacticalBlock = withComputerMoveExplanation(
+      state,
+      chooseComputerMove(state, 8, useAlphaBeta, AI, { randomizeTies: false })
+    );
+    checks.push({
+      name: "forced immediate block uses tactical shortcut",
+      passed: tacticalBlock.move === 3
+        && tacticalBlock.nodes <= getLegalMoves(state).length + 1
+        && tacticalBlock.reason.includes("one-ply tactical check")
     });
 
     state = createBoard();

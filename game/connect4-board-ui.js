@@ -41,7 +41,10 @@
     function syncBoardInteractivity() {
       const boardElement = document.getElementById("board");
       if (!boardElement) return;
-      boardElement.classList.toggle("manual-drop-turn", isManualHumanTurn());
+      const manualTurn = isManualHumanTurn();
+      boardElement.classList.toggle("manual-drop-turn", manualTurn);
+      document.querySelector(".game-panel")?.classList.toggle("manual-drop-turn", manualTurn);
+      document.getElementById("columnControls")?.classList.toggle("manual-drop-turn", manualTurn);
     }
 
     function render(renderOptions = {}) {
@@ -72,7 +75,9 @@
           }
           if (manualTurn && board[0][col] === EMPTY) {
             cell.classList.add("drop-target");
-            if (hoverColumn === col) cell.classList.add("column-hover");
+            if (hoverColumn === col && row < ghostRow && board[row][col] === EMPTY) {
+              cell.classList.add("column-hover");
+            }
           }
           if (winSet.has(`${row},${col}`)) cell.classList.add("win");
           boardElement.appendChild(cell);

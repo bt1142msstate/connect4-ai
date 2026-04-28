@@ -22,6 +22,7 @@
   --empty: #101928;
   --focus: #f8fafc;
   --felt: #2dd4bf;
+  --drop-cursor: url("../assets/red-arrow-cursor.svg") 5 4, pointer;
 }
 
 * {
@@ -247,6 +248,10 @@ input:focus-visible {
   transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
 }
 
+.column-controls.manual-drop-turn .column-button:not(:disabled) {
+  cursor: var(--drop-cursor);
+}
+
 .column-button:hover:not(:disabled) {
   background: linear-gradient(180deg, rgba(55, 84, 126, 0.98), rgba(28, 47, 76, 0.98));
   border-color: rgba(75, 163, 255, 0.68);
@@ -296,8 +301,14 @@ input:focus-visible {
     0 2px 0 rgba(255, 255, 255, 0.12);
 }
 
+.game-panel.manual-drop-turn .board-wrap,
+.game-panel.manual-drop-turn .board,
+.column-controls.manual-drop-turn {
+  cursor: var(--drop-cursor);
+}
+
 .board.manual-drop-turn .cell.drop-target {
-  cursor: pointer;
+  cursor: var(--drop-cursor);
 }
 
 .board.manual-drop-turn .cell.column-hover {

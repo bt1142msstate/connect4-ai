@@ -194,19 +194,41 @@
       });
     }
 
+    function getClosestColumnFromPointer(event) {
+      const boardElement = event.currentTarget;
+      if (!boardElement) return null;
+
+      let closestColumn = null;
+      let closestDistance = Infinity;
+      for (let col = 0; col < COLS; col += 1) {
+        const topCell = boardElement.children[col];
+        if (!topCell) continue;
+        const rect = topCell.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const distance = Math.abs(event.clientX - centerX);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestColumn = col;
+        }
+      }
+
+      return closestColumn;
+    }
+
     function handleBoardPointer(event) {
-      const cell = event.target.closest(".cell");
-      if (!cell) {
+      const col = getClosestColumnFromPointer(event);
+      if (col === null) {
         clearHoverColumn();
         return;
       }
-      setHoverColumn(Number(cell.dataset.col));
+      setHoverColumn(col);
     }
 
     function handleBoardClick(event) {
-      const cell = event.target.closest(".cell");
-      if (!cell) return;
-      onHumanMove(Number(cell.dataset.col));
+      const col = getClosestColumnFromPointer(event);
+      if (col !== null) {
+        onHumanMove(col);
+      }
     }
 
     function handleKeyboardDrop(event) {
@@ -239,6 +261,7 @@
       getGhostRow,
       setHoverColumn,
       clearHoverColumn,
+      getClosestColumnFromPointer,
       handleBoardPointer,
       handleBoardClick,
       handleKeyboardDrop,

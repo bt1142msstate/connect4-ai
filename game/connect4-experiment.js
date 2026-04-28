@@ -57,6 +57,7 @@
   }
 
   function runBenchmarkOnState(state, depths = [3, 4, 5]) {
+    // For each depth, compare plain minimax against alpha-beta on the same board.
     const rows = [];
     for (const depth of depths) {
       rows.push(chooseAiMove(state, depth, false));
@@ -70,6 +71,7 @@
   }
 
   function createPreparedExperimentBoard() {
+    // A fixed midgame board gives repeatable evidence beyond the empty opening.
     const state = createBoard();
     const sequence = [
       [3, HUMAN],
@@ -119,6 +121,7 @@
   }
 
   function compareDepth(snapshot, depth) {
+    // Correct alpha-beta should match plain minimax while searching fewer or equal nodes.
     const plain = chooseAiMove(snapshot, depth, false);
     const pruned = chooseAiMove(snapshot, depth, true);
 
@@ -192,6 +195,7 @@
   }
 
   function buildExperimentResult(overrides = {}, options = {}) {
+    // Synchronous builder is used by the command line exports.
     const config = normalizeExperimentConfig(overrides);
     const depths = getBenchmarkDepths(config.maxDepth);
     const boardSnapshot = createExperimentBoardSnapshot(config.boardSource, options.currentBoard, options.currentPlayer);
@@ -203,6 +207,7 @@
   }
 
   async function buildExperimentResultWithProgress(overrides = {}, options = {}) {
+    // Async builder yields between expensive steps so the browser progress bar can repaint.
     const config = normalizeExperimentConfig(overrides);
     const depths = getBenchmarkDepths(config.maxDepth);
     const boardSnapshot = createExperimentBoardSnapshot(config.boardSource, options.currentBoard, options.currentPlayer);
@@ -265,6 +270,7 @@
   }
 
   function experimentToCsv(result) {
+    // CSV output gives a simple artifact the report or grader can open in a spreadsheet.
     const rows = [["Section", "Name", "Algorithm", "Depth", "Nodes", "Time Seconds", "Move", "Score", "Result", "Notes"]];
     rows.push([
       "Experiment Config",
@@ -340,6 +346,7 @@
   }
 
   function buildExperimentSummaryText(result) {
+    // Text output is intentionally plain so it is easy to attach or paste into notes.
     const totalPlainNodes = result.comparisons.reduce((sum, item) => sum + item.plain.nodes, 0);
     const totalPrunedNodes = result.comparisons.reduce((sum, item) => sum + item.alphaBeta.nodes, 0);
     const nodeReduction = totalPlainNodes === 0 ? 0 : ((1 - totalPrunedNodes / totalPlainNodes) * 100);

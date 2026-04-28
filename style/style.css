@@ -546,6 +546,7 @@ select option {
 
 .switch-ui {
   position: relative;
+  pointer-events: none;
   width: 50px;
   height: 28px;
   border-radius: 999px;

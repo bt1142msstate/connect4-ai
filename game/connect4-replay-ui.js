@@ -16,6 +16,7 @@
   } = engine;
 
   function createReplayController(options = {}) {
+    // Replay stores only moves and search snapshots; boards are rebuilt from history.
     let moveHistory = [];
     let replayStep = 0;
     let replayTimer = null;
@@ -36,6 +37,7 @@
     }
 
     function buildBoardFromMoves(step) {
+      // Rebuilding makes slider jumps deterministic and independent of the live board.
       const replayBoard = createBoard();
       for (const move of moveHistory.slice(0, step)) {
         dropPiece(replayBoard, move.col, move.player);
@@ -87,6 +89,7 @@
     }
 
     function updateMoveInsight() {
+      // AI moves include the same search facts shown during live play.
       const panel = document.getElementById("replayMoveInsight");
       if (!panel) return;
 
@@ -165,6 +168,7 @@
     }
 
     async function showStep(step, options = {}) {
+      // One-step forward playback animates drops; large slider jumps switch instantly.
       if (!options.keepPlaying) {
         stopPlayback();
       }
@@ -195,6 +199,7 @@
     }
 
     function scheduleAdvance(runId) {
+      // Playback waits for each drop animation before scheduling the next move.
       replayTimer = window.setTimeout(async () => {
         replayTimer = null;
         if (runId !== playbackRunId) return;

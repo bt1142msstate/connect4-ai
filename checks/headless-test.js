@@ -1,5 +1,5 @@
 // CLI smoke test wrapper for the reusable Connect 4 engine validation suite.
-const connect4 = require("../js/connect4-engine.js");
+const connect4 = require("../game/connect4-engine.js");
 
 const depthArg = process.argv.find((arg) => arg.startsWith("--depth="));
 const redDepthArg = process.argv.find((arg) => arg.startsWith("--red-depth="));
@@ -15,6 +15,7 @@ const alternateStart = process.argv.includes("--alternate-start");
 const seedArg = process.argv.find((arg) => arg.startsWith("--seed="));
 const seed = seedArg ? Number(seedArg.split("=")[1]) : undefined;
 
+// The reusable suite lives in the engine so browser logic and CLI checks share behavior.
 const result = connect4.runHeadlessSuite({ depth, redDepth, yellowDepth, games, useAlphaBeta, randomizeTies, alternateStart, seed });
 
 console.log(`Headless Connect 4 test suite`);

@@ -59,6 +59,7 @@ const {
   experimentToCsv
 } = Connect4Experiment;
 
+// Live game state stays in this controller; helper modules read it through callbacks.
 let board = createBoard();
 let gameOver = false;
 let isAiThinking = false;
@@ -106,6 +107,7 @@ function updateColumnButtons() {
 }
 
 async function handleHumanMove(col) {
+  // Manual input is accepted only during a playable Red turn and only in open columns.
   if (isRedAiEnabled() || currentPlayer !== HUMAN || gameOver || isAiThinking || board[0][col] !== EMPTY) {
     return;
   }
@@ -140,6 +142,7 @@ async function handleHumanMove(col) {
 }
 
 async function makeComputerMove(activeToken = moveToken) {
+  // A token prevents delayed AI moves from landing after reset or replay state changes.
   if (activeToken !== moveToken) return;
   pendingComputerTimeout = null;
   const depth = getDepthForPlayer(currentPlayer);
@@ -183,6 +186,7 @@ async function makeComputerMove(activeToken = moveToken) {
 }
 
 function updateStats(result) {
+  // The stats panel mirrors the latest AI search so the decision can be inspected.
   document.getElementById("statPlayer").textContent = result.player === HUMAN ? "Red" : "Yellow";
   document.getElementById("statAlgorithm").textContent = result.algorithm;
   document.getElementById("statDepth").textContent = result.depth;
@@ -198,6 +202,7 @@ function updateStats(result) {
 }
 
 function resetGame() {
+  // Reset clears timers, search state, replay history, and restores Red as the starter.
   moveToken += 1;
   clearPendingComputerMove();
   board = createBoard();
@@ -237,6 +242,7 @@ function shouldComputerPlayCurrentTurn() {
 }
 
 function getTurnStatus() {
+  // Status text calls out immediate wins and unavoidable threats without changing gameplay.
   if (gameOver) return "";
   const currentWins = getImmediateWinningMoves(board, currentPlayer);
   const opponent = currentPlayer === HUMAN ? AI : HUMAN;
@@ -269,6 +275,7 @@ function getTurnStatus() {
 }
 
 function scheduleComputerMove(activeToken) {
+  // Small delays make automated turns readable and give the UI time to update.
   clearPendingComputerMove();
   if (!shouldComputerPlayCurrentTurn()) return;
   isAiThinking = true;
@@ -348,6 +355,7 @@ function createReportPdf() {
 }
 
 function initBrowserGame() {
+  // Wire modules after the DOM exists so the static file:// page can run without a server.
   boardUi = Connect4BoardUi.createBoardUi({
     getBoard: () => board,
     getWinningCells: () => winningCells,

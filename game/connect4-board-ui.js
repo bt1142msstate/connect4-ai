@@ -16,6 +16,7 @@
   const DROP_ANIMATION_MS = 300;
 
   function createBoardUi(options = {}) {
+    // The board UI never owns rules; it asks the controller for current state.
     let hoverColumn = null;
 
     const getBoard = options.getBoard ?? (() => []);
@@ -38,6 +39,7 @@
     }
 
     function render(renderOptions = {}) {
+      // Rebuild all 42 cells from state, then let CSS handle pieces and highlights.
       const board = getBoard();
       const boardElement = document.getElementById("board");
       boardElement.innerHTML = "";
@@ -69,6 +71,7 @@
     }
 
     function animateDrop(row, col, player) {
+      // A temporary overlay piece animates into the hidden final cell to avoid overshoot.
       const boardElement = document.getElementById("board");
       const targetIndex = row * COLS + col;
       const targetCell = boardElement.children[targetIndex];
@@ -125,6 +128,7 @@
     }
 
     function setHoverColumn(col) {
+      // Hover and focus show a ghost piece in the row where the next red piece would land.
       const board = getBoard();
       if (!isManualHumanTurn() || board[0][col] !== EMPTY) {
         clearHoverColumn();
@@ -144,6 +148,7 @@
     }
 
     function createColumnControls() {
+      // Numbered buttons match the keyboard shortcuts, so columns can be played by click or key.
       const controls = document.getElementById("columnControls");
       controls.innerHTML = "";
 
@@ -187,6 +192,7 @@
     }
 
     function handleKeyboardDrop(event) {
+      // Number keys 1-7 drop pieces unless the user is editing a form control or overlay.
       if (!/^[1-7]$/.test(event.key)) return;
       if (isExperimentLabOpen() || isWalkthroughOpen()) return;
       const activeTag = document.activeElement ? document.activeElement.tagName : "";

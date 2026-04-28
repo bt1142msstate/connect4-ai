@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Connect 4 AI Report</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="style/style.css">
 </head>
 <body class="report-body">
   <main class="report-page">
@@ -58,7 +58,7 @@
       <article class="report-section span-2">
         <h2>Project Features</h2>
         <div class="checklist-grid">
-          <div>Static site with separated engine/UI JavaScript files</div>
+          <div>Static site organized into game, style, and validation folders</div>
           <div>7 x 6 board with gravity drops, legal move checks, reset, wins, and draws</div>
           <div>Depth-limited minimax with yellow maximizing and red minimizing</div>
           <div>Alpha-beta pruning with move, node, runtime, algorithm, and depth stats</div>
@@ -73,13 +73,10 @@
       <article class="report-section span-2">
         <h2>How to Run</h2>
         <p>
-          The game runs by opening <code>index.html</code>; no server or internet connection is required. Optional
-          validation runs with <code>node tests/headless-test.js</code>. The reusable board rules and AI search live in
-          <code>js/connect4-engine.js</code>. Experiment evidence generation lives in <code>js/connect4-experiment.js</code>,
-          the Experiment Lab UI lives in <code>js/connect4-experiment-ui.js</code>, replay controls live in
-          <code>js/connect4-replay-ui.js</code>, board rendering lives in <code>js/connect4-board-ui.js</code>,
-          <code>js/connect4-cli.js</code> handles Node commands, and <code>js/connect4-game-controller.js</code>
-          handles the browser game controller.
+          The game runs by opening <code>index.html</code>; no server or internet connection is required. Source files are
+          grouped into <code>game/</code> for gameplay and search, <code>style/</code> for the visual design, and
+          <code>checks/</code> for optional Node validation. The main validation command is
+          <code>node checks/headless-test.js</code>.
         </p>
       </article>
 
@@ -221,9 +218,9 @@
       <article class="report-section span-2">
         <h2>Testing Commands</h2>
         <div class="command-list">
-          <code>node tests/headless-test.js</code>
-          <code>node js/connect4-game-controller.js --headless --red-depth=2 --yellow-depth=6 --games=6 --format=summary</code>
-          <code>node js/connect4-game-controller.js --experiment --board=midgame --max-depth=6 --format=csv --out=experiment.csv</code>
+          <code>node checks/headless-test.js</code>
+          <code>node game/connect4-game-controller.js --headless --red-depth=2 --yellow-depth=6 --games=6 --format=summary</code>
+          <code>node game/connect4-game-controller.js --experiment --board=midgame --max-depth=6 --format=csv --out=experiment.csv</code>
         </div>
       </article>
 

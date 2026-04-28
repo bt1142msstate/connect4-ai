@@ -7,6 +7,7 @@
   const AI = 2;
   const WIN_SCORE = 100000;
 
+  // Board helpers keep the same 6x7 array shape in the browser and Node tests.
   function createBoard() {
     return Array.from({ length: ROWS }, () => Array(COLS).fill(EMPTY));
   }
@@ -56,6 +57,7 @@
   }
 
   function checkWin(state, player) {
+    // These four directions cover horizontal, vertical, and both diagonal wins.
     const directions = [
       [0, 1],
       [1, 0],
@@ -91,6 +93,7 @@
   }
 
   function scoreWindow(windowCells) {
+    // Each four-cell window is scored with the project heuristic from the report.
     const aiCount = windowCells.filter((cell) => cell === AI).length;
     const humanCount = windowCells.filter((cell) => cell === HUMAN).length;
     const emptyCount = windowCells.filter((cell) => cell === EMPTY).length;
@@ -105,6 +108,7 @@
   }
 
   function evaluateBoard(state) {
+    // Terminal boards get exact scores; non-terminal boards get center and window bonuses.
     const aiWin = checkWin(state, AI);
     if (aiWin.won) return WIN_SCORE;
     const humanWin = checkWin(state, HUMAN);
@@ -147,17 +151,20 @@
   }
 
   function orderMoves(moves) {
+    // Searching center columns first improves alpha-beta pruning without changing minimax values.
     const center = Math.floor(COLS / 2);
     return moves.slice().sort((a, b) => Math.abs(a - center) - Math.abs(b - center));
   }
 
   function getTerminalScore(aiWin, humanWin, depthRemaining) {
+    // Depth adjustment makes the AI prefer faster wins and postpone unavoidable losses.
     if (aiWin) return WIN_SCORE + depthRemaining;
     if (humanWin) return -WIN_SCORE - depthRemaining;
     return 0;
   }
 
   function minimax(state, depth, alpha, beta, maximizingPlayer, useAlphaBeta, stats) {
+    // MAX nodes are Yellow AI turns; MIN nodes are Red turns, whether human or autopilot.
     stats.nodes += 1;
 
     const legalMoves = orderMoves(getLegalMoves(state));
@@ -223,6 +230,7 @@
   }
 
   function chooseRootMove(state, depth, useAlphaBeta, player = AI, options = {}) {
+    // Root search records the chosen move, score, timing, node count, and equal-score ties.
     const searchDepth = Math.max(0, depth);
     const maximizing = player === AI;
     const stats = { nodes: 1 };
@@ -331,6 +339,7 @@
   }
 
   function explainComputerMove(stateBeforeMove, result) {
+    // Short explanations translate search results into classroom-friendly move reasoning.
     const player = result.player;
     const opponent = getOpponent(player);
     const playerName = formatPlayer(player);
@@ -405,6 +414,7 @@
   }
 
   function playHeadlessGame(options = {}) {
+    // Headless games reuse the exact same engine as the browser so validation is meaningful.
     const depth = options.depth ?? 4;
     const redDepth = options.redDepth ?? depth;
     const yellowDepth = options.yellowDepth ?? depth;
@@ -456,6 +466,7 @@
   }
 
   function runHeadlessSuite(options = {}) {
+    // The suite checks rules, edge cases, search behavior, and short AI-vs-AI simulations.
     const depth = options.depth ?? 4;
     const redDepth = options.redDepth ?? depth;
     const yellowDepth = options.yellowDepth ?? depth;

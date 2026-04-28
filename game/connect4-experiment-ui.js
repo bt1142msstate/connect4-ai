@@ -15,6 +15,7 @@
   } = experiment;
 
   function yieldToBrowser() {
+    // Yielding lets progress text and bars paint between deeper searches.
     return new Promise((resolve) => {
       if (typeof requestAnimationFrame === "function") {
         requestAnimationFrame(() => resolve());
@@ -49,6 +50,7 @@
   }
 
   function createExperimentLab(options = {}) {
+    // The lab reads the current board through callbacks and keeps its latest export in memory.
     let latestExperimentResult = null;
     const getCurrentBoard = options.getCurrentBoard ?? (() => null);
     const getCurrentPlayer = options.getCurrentPlayer ?? (() => null);
@@ -70,6 +72,7 @@
     }
 
     function getConfig(overrides = {}) {
+      // Browser controls are clamped to practical values so depth-6 runs stay responsive.
       const maxDepth = Number(overrides.maxDepth ?? getControlValue("experimentMaxDepth", 5));
       const validationGames = Number(overrides.validationGames ?? getControlValue("experimentValidationGames", 2));
       return {
@@ -97,6 +100,7 @@
     }
 
     function renderResult(result) {
+      // Render proof cards, benchmark rows, validation checks, and matchup sanity checks together.
       const rowsElement = document.getElementById("benchmarkRows");
       const proofGrid = document.getElementById("proofGrid");
       const summary = document.getElementById("experimentSummary");
@@ -187,6 +191,7 @@
     }
 
     async function run() {
+      // Disable export buttons until the fresh run has completed successfully.
       const runButton = document.getElementById("runExperimentButton");
       const rowsElement = document.getElementById("benchmarkRows");
       const config = getConfig();

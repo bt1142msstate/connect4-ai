@@ -15,6 +15,7 @@
   } = experiment;
 
   function getCliOption(args, name, fallback) {
+    // Options use --name=value so commands stay easy to paste into the report.
     const prefix = `--${name}=`;
     const match = args.find((arg) => arg.startsWith(prefix));
     if (!match) return fallback;
@@ -28,6 +29,7 @@
   }
 
   function buildHeadlessSummaryText(result) {
+    // Human-readable summaries are useful for quick validation without parsing JSON.
     const lines = [
       "Connect 4 AI Headless Validation",
       `Depth: ${result.depth}`,
@@ -69,6 +71,7 @@
   }
 
   function writeCliPayload(payload, options = {}) {
+    // The same command can print to stdout or write a report-ready artifact.
     const format = options.format ?? "json";
     const type = options.type ?? "headless";
     const content = formatCliPayload(payload, format, type);
@@ -85,22 +88,23 @@
     process.stdout.write(`Connect 4 AI headless commands
 
 Validation suite:
-  node js/connect4-game-controller.js --headless [--depth=4] [--red-depth=2] [--yellow-depth=6] [--games=4]
+  node game/connect4-game-controller.js --headless [--depth=4] [--red-depth=2] [--yellow-depth=6] [--games=4]
                  [--plain-minimax] [--variety] [--alternate-start] [--seed=42]
                  [--format=json|summary] [--out=path]
 
 Experiment evidence:
-  node js/connect4-game-controller.js --experiment [--board=empty|midgame|current] [--max-depth=5]
+  node game/connect4-game-controller.js --experiment [--board=empty|midgame|current] [--max-depth=5]
                  [--validation-games=4] [--no-tie-variation] [--no-matchups]
                  [--format=json|csv|summary] [--out=path]
 
 Examples:
-  node js/connect4-game-controller.js --headless --red-depth=2 --yellow-depth=6 --games=6 --format=summary
-  node js/connect4-game-controller.js --experiment --board=midgame --max-depth=6 --format=csv --out=experiment.csv
+  node game/connect4-game-controller.js --headless --red-depth=2 --yellow-depth=6 --games=6 --format=summary
+  node game/connect4-game-controller.js --experiment --board=midgame --max-depth=6 --format=csv --out=experiment.csv
 `);
   }
 
   function runCli(args = process.argv.slice(2)) {
+    // One entry point supports both validation games and experiment evidence exports.
     if (args.includes("--help") || args.includes("-h")) {
       printCliHelp();
       process.exit(0);

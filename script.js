@@ -2,6 +2,10 @@ const Connect4Engine = typeof module !== "undefined" && module.exports
   ? require("./connect4-engine.js")
   : globalThis.Connect4Engine;
 
+const Connect4Experiment = typeof module !== "undefined" && module.exports
+  ? require("./connect4-experiment.js")
+  : globalThis.Connect4Experiment;
+
 const {
   ROWS,
   COLS,
@@ -26,12 +30,22 @@ const {
   runHeadlessSuite,
   withComputerMoveExplanation,
   createSearchSnapshot,
-  createSeededRandom,
   formatColumns,
   formatPlayer,
   formatNumber,
   formatSeconds
 } = Connect4Engine;
+
+const {
+  runBenchmarkOnState,
+  getBenchmarkDepths,
+  createPreparedExperimentBoard,
+  createExperimentBoardSnapshot,
+  buildExperimentResult,
+  buildExperimentResultWithProgress,
+  buildExperimentSummaryText,
+  experimentToCsv
+} = Connect4Experiment;
 
 const DROP_ANIMATION_MS = 300;
 
@@ -610,15 +624,6 @@ function toggleStats() {
   statsPanel.hidden = !document.getElementById("showStats").checked;
 }
 
-function runBenchmarkOnState(state, depths = [3, 4, 5]) {
-  const rows = [];
-  for (const depth of depths) {
-    rows.push(chooseAiMove(state, depth, false));
-    rows.push(chooseAiMove(state, depth, true));
-  }
-  return rows;
-}
-
 function openExperimentLab() {
   const overlay = document.getElementById("experimentOverlay");
   overlay.hidden = false;
@@ -673,10 +678,6 @@ function getExperimentConfig(overrides = {}) {
   };
 }
 
-function getBenchmarkDepths(maxDepth) {
-  return Array.from({ length: maxDepth - 1 }, (_, index) => index + 2);
-}
-
 function yieldToBrowser() {
   return new Promise((resolve) => {
     if (typeof requestAnimationFrame === "function") {
@@ -700,242 +701,6 @@ function setExperimentProgress(percent, label) {
 function hideExperimentProgress() {
   const progress = document.getElementById("experimentProgress");
   if (progress) progress.hidden = true;
-}
-
-function createPreparedExperimentBoard() {
-  const state = createBoard();
-  const sequence = [
-    [3, HUMAN],
-    [3, AI],
-    [2, HUMAN],
-    [4, AI],
-    [2, HUMAN],
-    [4, AI],
-    [1, HUMAN],
-    [5, AI],
-    [3, HUMAN],
-    [2, AI],
-    [5, HUMAN],
-    [1, AI]
-  ];
-  for (const [col, player] of sequence) {
-    dropPiece(state, col, player);
-  }
-  return state;
-}
-
-function getExperimentBoardSnapshot(source) {
-  if (source === "current") {
-    return {
-      state: copyBoard(board),
-      label: "Current game position",
-      shortLabel: "Current",
-      playerLabel: formatPlayer(currentPlayer)
-    };
-  }
-
-  if (source === "midgame") {
-    return {
-      state: createPreparedExperimentBoard(),
-      label: "Prepared midgame test position",
-      shortLabel: "Midgame",
-      playerLabel: "Yellow benchmark"
-    };
-  }
-
-  return {
-    state: createBoard(),
-    label: "Empty starting board",
-    shortLabel: "Empty",
-    playerLabel: "Yellow benchmark"
-  };
-}
-
-function buildExperimentResult(overrides = {}) {
-  const config = getExperimentConfig(overrides);
-  const depths = getBenchmarkDepths(config.maxDepth);
-  const boardSnapshot = getExperimentBoardSnapshot(config.boardSource);
-  const snapshot = boardSnapshot.state;
-  const comparisons = depths.map((depth) => {
-    const plain = chooseAiMove(snapshot, depth, false);
-    const pruned = chooseAiMove(snapshot, depth, true);
-    return {
-      depth,
-      plain,
-      alphaBeta: pruned,
-      sameMove: plain.move === pruned.move,
-      sameScore: plain.score === pruned.score,
-      fewerOrEqualNodes: pruned.nodes <= plain.nodes
-    };
-  });
-
-  const validation = runHeadlessSuite({
-    depth: 3,
-    redDepth: 2,
-    yellowDepth: 4,
-    games: config.validationGames,
-    useAlphaBeta: true,
-    randomizeTies: config.tieVariation,
-    seed: 42
-  });
-
-  const matchups = config.includeMatchups ? [
-    {
-      label: "Easy Red Autopilot vs Expert Yellow Opponent",
-      redDepth: 2,
-      yellowDepth: 6,
-      expectedWinner: "Yellow",
-      simulation: playHeadlessGame({
-        redDepth: 2,
-        yellowDepth: 6,
-        useAlphaBeta: true,
-        randomizeTies: true,
-        randomFn: createSeededRandom(101)
-      })
-    },
-    {
-      label: "Expert Red Autopilot vs Easy Yellow Opponent",
-      redDepth: 6,
-      yellowDepth: 2,
-      expectedWinner: "Red",
-      simulation: playHeadlessGame({
-        redDepth: 6,
-        yellowDepth: 2,
-        useAlphaBeta: true,
-        randomizeTies: true,
-        randomFn: createSeededRandom(202)
-      })
-    }
-  ].map((matchup) => ({
-    ...matchup,
-    winner: formatPlayer(matchup.simulation.winner),
-    moves: matchup.simulation.moves.length,
-    totalNodes: matchup.simulation.totalNodes,
-    passed: formatPlayer(matchup.simulation.winner) === matchup.expectedWinner
-  })) : [];
-
-  return {
-    generatedAt: new Date().toISOString(),
-    config: {
-      ...config,
-      depths
-    },
-    boardSourceLabel: boardSnapshot.label,
-    boardSourceShortLabel: boardSnapshot.shortLabel,
-    currentBoard: snapshot,
-    legalMoves: getLegalMoves(snapshot).map((col) => col + 1),
-    currentPlayer: boardSnapshot.playerLabel,
-    comparisons,
-    validation,
-    matchups,
-    conclusion: "Alpha-beta should preserve the minimax move and score while searching fewer or equal nodes."
-  };
-}
-
-async function buildExperimentResultWithProgress() {
-  const config = getExperimentConfig();
-  const depths = getBenchmarkDepths(config.maxDepth);
-  const boardSnapshot = getExperimentBoardSnapshot(config.boardSource);
-  const snapshot = boardSnapshot.state;
-  const comparisons = [];
-  const matchupTasks = config.includeMatchups ? 2 : 0;
-  const totalSteps = depths.length * 2 + 1 + matchupTasks + 1;
-  let completedSteps = 0;
-
-  const advance = async (label, increment = 0) => {
-    completedSteps += increment;
-    setExperimentProgress((completedSteps / totalSteps) * 100, label);
-    await yieldToBrowser();
-  };
-
-  await advance("Preparing board snapshot...");
-
-  for (const depth of depths) {
-    await advance(`Running plain minimax at depth ${depth}...`);
-    const plain = chooseAiMove(snapshot, depth, false);
-    await advance(`Running alpha-beta at depth ${depth}...`, 1);
-    const pruned = chooseAiMove(snapshot, depth, true);
-    comparisons.push({
-      depth,
-      plain,
-      alphaBeta: pruned,
-      sameMove: plain.move === pruned.move,
-      sameScore: plain.score === pruned.score,
-      fewerOrEqualNodes: pruned.nodes <= plain.nodes
-    });
-    await advance(`Finished depth ${depth}.`, 1);
-  }
-
-  await advance("Running headless validation checks...");
-  const validation = runHeadlessSuite({
-    depth: 3,
-    redDepth: 2,
-    yellowDepth: 4,
-    games: config.validationGames,
-    useAlphaBeta: true,
-    randomizeTies: config.tieVariation,
-    seed: 42
-  });
-  await advance("Validation checks complete.", 1);
-
-  const matchups = [];
-  if (config.includeMatchups) {
-    const matchupDefinitions = [
-      {
-        label: "Easy Red Autopilot vs Expert Yellow Opponent",
-        redDepth: 2,
-        yellowDepth: 6,
-        expectedWinner: "Yellow",
-        seed: 101
-      },
-      {
-        label: "Expert Red Autopilot vs Easy Yellow Opponent",
-        redDepth: 6,
-        yellowDepth: 2,
-        expectedWinner: "Red",
-        seed: 202
-      }
-    ];
-
-    for (const matchup of matchupDefinitions) {
-      await advance(`Running matchup: ${matchup.label}...`);
-      const simulation = playHeadlessGame({
-        redDepth: matchup.redDepth,
-        yellowDepth: matchup.yellowDepth,
-        useAlphaBeta: true,
-        randomizeTies: true,
-        randomFn: createSeededRandom(matchup.seed)
-      });
-      matchups.push({
-        ...matchup,
-        simulation,
-        winner: formatPlayer(simulation.winner),
-        moves: simulation.moves.length,
-        totalNodes: simulation.totalNodes,
-        passed: formatPlayer(simulation.winner) === matchup.expectedWinner
-      });
-      await advance(`Finished matchup: ${matchup.label}.`, 1);
-    }
-  }
-
-  await advance("Rendering experiment evidence...", 1);
-
-  return {
-    generatedAt: new Date().toISOString(),
-    config: {
-      ...config,
-      depths
-    },
-    boardSourceLabel: boardSnapshot.label,
-    boardSourceShortLabel: boardSnapshot.shortLabel,
-    currentBoard: snapshot,
-    legalMoves: getLegalMoves(snapshot).map((col) => col + 1),
-    currentPlayer: boardSnapshot.playerLabel,
-    comparisons,
-    validation,
-    matchups,
-    conclusion: "Alpha-beta should preserve the minimax move and score while searching fewer or equal nodes."
-  };
 }
 
 function renderExperimentResult(result) {
@@ -1048,7 +813,14 @@ async function runExperiment() {
 
   try {
     await yieldToBrowser();
-    latestExperimentResult = await buildExperimentResultWithProgress();
+    latestExperimentResult = await buildExperimentResultWithProgress(config, {
+      currentBoard: board,
+      currentPlayer,
+      onProgress: async ({ percent, label }) => {
+        setExperimentProgress(percent, label);
+        await yieldToBrowser();
+      }
+    });
     renderExperimentResult(latestExperimentResult);
     setExperimentProgress(100, "Experiment complete.");
   } catch (error) {
@@ -1095,130 +867,9 @@ function downloadExperimentJson() {
   downloadText("connect4-ai-experiment-results.json", JSON.stringify(latestExperimentResult, null, 2), "application/json");
 }
 
-function csvValue(value) {
-  const text = String(value);
-  return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
-}
-
-function experimentToCsv(result) {
-  const rows = [["Section", "Name", "Algorithm", "Depth", "Nodes", "Time Seconds", "Move", "Score", "Result", "Notes"]];
-  rows.push([
-    "Experiment Config",
-    result.boardSourceLabel,
-    "",
-    result.config.depths.join(" / "),
-    "",
-    "",
-    "",
-    "",
-    "INFO",
-    `validationGames=${result.config.validationGames}; tieVariation=${result.config.tieVariation}; includeMatchups=${result.config.includeMatchups}`
-  ]);
-  for (const comparison of result.comparisons) {
-    for (const item of [comparison.plain, comparison.alphaBeta]) {
-      rows.push([
-        "Benchmark",
-        `Depth ${comparison.depth}`,
-        item.algorithm,
-        item.depth,
-        item.nodes,
-        (item.elapsed / 1000).toFixed(4),
-        item.move === null ? "-" : item.move + 1,
-        item.score,
-        comparison.sameMove && comparison.sameScore && comparison.fewerOrEqualNodes ? "PASS" : "CHECK",
-        `sameMove=${comparison.sameMove}; sameScore=${comparison.sameScore}; alphaBetaFewerOrEqualNodes=${comparison.fewerOrEqualNodes}`
-      ]);
-    }
-  }
-  for (const check of result.validation.checks) {
-    rows.push([
-      "Validation",
-      check.name,
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      check.passed ? "PASS" : "CHECK",
-      "Headless rule/search validation"
-    ]);
-  }
-  for (const matchup of result.matchups) {
-    rows.push([
-      "AI Matchup",
-      matchup.label,
-      "Minimax + Alpha-Beta",
-      `Red ${matchup.redDepth} / Yellow ${matchup.yellowDepth}`,
-      matchup.totalNodes,
-      "",
-      "",
-      "",
-      matchup.passed ? "PASS" : "REVIEW",
-      `expected=${matchup.expectedWinner}; observed=${matchup.winner}; moves=${matchup.moves}`
-    ]);
-  }
-  if (result.matchups.length === 0) {
-    rows.push([
-      "AI Matchup",
-      "Skipped by lab controls",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "SKIP",
-      "Enable AI matchup checks in the Experiment Lab to run these simulations."
-    ]);
-  }
-  return `${rows.map((row) => row.map(csvValue).join(",")).join("\n")}\n`;
-}
-
 function downloadExperimentCsv() {
   if (!latestExperimentResult) return;
   downloadText("connect4-ai-experiment-results.csv", experimentToCsv(latestExperimentResult), "text/csv");
-}
-
-function buildExperimentSummaryText(result) {
-  const totalPlainNodes = result.comparisons.reduce((sum, item) => sum + item.plain.nodes, 0);
-  const totalPrunedNodes = result.comparisons.reduce((sum, item) => sum + item.alphaBeta.nodes, 0);
-  const nodeReduction = totalPlainNodes === 0 ? 0 : ((1 - totalPrunedNodes / totalPlainNodes) * 100);
-  const lines = [
-    "Connect 4 AI Experiment Evidence",
-    `Generated: ${result.generatedAt}`,
-    `Board source: ${result.boardSourceLabel}`,
-    `Benchmark depths: ${result.config.depths.join(", ")}`,
-    `Validation games: ${result.config.validationGames}`,
-    `Tie variation checks: ${result.config.tieVariation ? "enabled" : "disabled"}`,
-    `AI matchup checks: ${result.config.includeMatchups ? "enabled" : "disabled"}`,
-    `Player context: ${result.currentPlayer}`,
-    `Legal moves in board snapshot: ${result.legalMoves.join(", ") || "none"}`,
-    "",
-    "Main claim:",
-    result.conclusion,
-    `Total plain minimax nodes: ${totalPlainNodes}`,
-    `Total alpha-beta nodes: ${totalPrunedNodes}`,
-    `Node reduction: ${nodeReduction.toFixed(1)}%`,
-    "",
-    "Depth comparisons:"
-  ];
-  for (const comparison of result.comparisons) {
-    lines.push(`Depth ${comparison.depth}: same move=${comparison.sameMove}, same score=${comparison.sameScore}, plain nodes=${comparison.plain.nodes}, alpha-beta nodes=${comparison.alphaBeta.nodes}`);
-  }
-  lines.push("", "Validation checks:");
-  for (const check of result.validation.checks) {
-    lines.push(`${check.passed ? "PASS" : "CHECK"} - ${check.name}`);
-  }
-  lines.push("", "AI matchup sanity checks:");
-  if (result.matchups.length === 0) {
-    lines.push("SKIP - Matchup checks were disabled in the Experiment Lab controls.");
-  } else {
-    for (const matchup of result.matchups) {
-      lines.push(`${matchup.passed ? "PASS" : "REVIEW"} - ${matchup.label}: expected ${matchup.expectedWinner}, observed ${matchup.winner}, moves=${matchup.moves}, nodes=${matchup.totalNodes}`);
-    }
-  }
-  return `${lines.join("\n")}\n`;
 }
 
 function downloadExperimentSummary() {
@@ -1317,132 +968,8 @@ if (typeof document !== "undefined") {
   initBrowserGame();
 }
 
-function getCliOption(args, name, fallback) {
-  const prefix = `--${name}=`;
-  const match = args.find((arg) => arg.startsWith(prefix));
-  if (!match) return fallback;
-  return match.slice(prefix.length);
-}
-
-function getCliBoolean(args, name, fallback = false) {
-  if (args.includes(`--${name}`)) return true;
-  if (args.includes(`--no-${name}`)) return false;
-  return fallback;
-}
-
-function buildHeadlessSummaryText(result) {
-  const lines = [
-    "Connect 4 AI Headless Validation",
-    `Depth: ${result.depth}`,
-    `Red depth: ${result.redDepth}`,
-    `Yellow depth: ${result.yellowDepth}`,
-    `Games: ${result.games}`,
-    `Algorithm: ${result.useAlphaBeta ? "Minimax + Alpha-Beta" : "Plain Minimax"}`,
-    `Equal-score move variation: ${result.randomizeTies ? "on" : "off"}`,
-    `Alternate starting player: ${result.alternateStart ? "on" : "off"}`,
-    `Overall result: ${result.passed ? "PASS" : "CHECK"}`,
-    "",
-    "Checks:"
-  ];
-
-  for (const check of result.checks) {
-    lines.push(`${check.passed ? "PASS" : "CHECK"} - ${check.name}`);
-  }
-
-  lines.push("", "Simulations:");
-  for (const simulation of result.simulations) {
-    lines.push(`Game ${simulation.game}: winner=${simulation.winner}, moves=${simulation.moves}, nodes=${simulation.totalNodes}, time=${simulation.totalTimeSeconds}s`);
-    lines.push(`Moves: ${simulation.moveSequence}`);
-  }
-
-  return `${lines.join("\n")}\n`;
-}
-
-function formatCliPayload(payload, format, type = "headless") {
-  if (format === "summary") {
-    return type === "experiment" ? buildExperimentSummaryText(payload) : buildHeadlessSummaryText(payload);
-  }
-  if (format === "csv") {
-    if (type !== "experiment") {
-      throw new Error("--format=csv is available for --experiment output.");
-    }
-    return experimentToCsv(payload);
-  }
-  return `${JSON.stringify(payload, null, 2)}\n`;
-}
-
-function writeCliPayload(payload, options = {}) {
-  const format = options.format ?? "json";
-  const type = options.type ?? "headless";
-  const content = formatCliPayload(payload, format, type);
-  if (options.out) {
-    const fs = require("fs");
-    fs.writeFileSync(options.out, content);
-    console.log(`Wrote ${type} ${format} output to ${options.out}`);
-    return;
-  }
-  process.stdout.write(content);
-}
-
-function printCliHelp() {
-  process.stdout.write(`Connect 4 AI headless commands
-
-Validation suite:
-  node script.js --headless [--depth=4] [--red-depth=2] [--yellow-depth=6] [--games=4]
-                 [--plain-minimax] [--variety] [--alternate-start] [--seed=42]
-                 [--format=json|summary] [--out=path]
-
-Experiment evidence:
-  node script.js --experiment [--board=empty|midgame|current] [--max-depth=5]
-                 [--validation-games=4] [--no-tie-variation] [--no-matchups]
-                 [--format=json|csv|summary] [--out=path]
-
-Examples:
-  node script.js --headless --red-depth=2 --yellow-depth=6 --games=6 --format=summary
-  node script.js --experiment --board=midgame --max-depth=6 --format=csv --out=experiment.csv
-`);
-}
-
 if (typeof module !== "undefined" && require.main === module) {
-  const args = process.argv.slice(2);
-  if (args.includes("--help") || args.includes("-h")) {
-    printCliHelp();
-    process.exit(0);
-  }
-
-  if (args.includes("--experiment") || args.includes("--benchmark")) {
-    const result = buildExperimentResult({
-      boardSource: getCliOption(args, "board", "empty"),
-      maxDepth: Number(getCliOption(args, "max-depth", 5)),
-      validationGames: Number(getCliOption(args, "validation-games", 2)),
-      tieVariation: !args.includes("--no-tie-variation"),
-      includeMatchups: !args.includes("--no-matchups")
-    });
-    writeCliPayload(result, {
-      type: "experiment",
-      format: getCliOption(args, "format", "json"),
-      out: getCliOption(args, "out", "")
-    });
-    process.exit(0);
-  }
-
-  if (args.includes("--headless")) {
-    const depth = Number(getCliOption(args, "depth", 4));
-    const redDepth = Number(getCliOption(args, "red-depth", depth));
-    const yellowDepth = Number(getCliOption(args, "yellow-depth", depth));
-    const games = Number(getCliOption(args, "games", 2));
-    const useAlphaBeta = !args.includes("--plain-minimax");
-    const randomizeTies = getCliBoolean(args, "variety", false);
-    const alternateStart = getCliBoolean(args, "alternate-start", false);
-    const seed = args.some((arg) => arg.startsWith("--seed=")) ? Number(getCliOption(args, "seed", 1)) : undefined;
-    const result = runHeadlessSuite({ depth, redDepth, yellowDepth, games, useAlphaBeta, randomizeTies, alternateStart, seed });
-    writeCliPayload(result, {
-      type: "headless",
-      format: getCliOption(args, "format", "json"),
-      out: getCliOption(args, "out", "")
-    });
-    process.exit(result.passed ? 0 : 1);
-  }
+  require("./connect4-cli.js").runCli(process.argv.slice(2));
 }
 
 if (typeof module !== "undefined") {
@@ -1469,8 +996,12 @@ if (typeof module !== "undefined") {
     playHeadlessGame,
     runHeadlessSuite,
     runBenchmarkOnState,
+    getBenchmarkDepths,
+    createPreparedExperimentBoard,
+    createExperimentBoardSnapshot,
     withComputerMoveExplanation,
     buildExperimentResult,
+    buildExperimentResultWithProgress,
     buildExperimentSummaryText,
     experimentToCsv
   };

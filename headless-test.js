@@ -1,4 +1,4 @@
-const connect4 = require("./script.js");
+const connect4 = require("./connect4-engine.js");
 
 const depthArg = process.argv.find((arg) => arg.startsWith("--depth="));
 const redDepthArg = process.argv.find((arg) => arg.startsWith("--red-depth="));

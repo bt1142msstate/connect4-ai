@@ -19,6 +19,10 @@ const Connect4BoardUi = typeof module !== "undefined" && module.exports
   ? null
   : globalThis.Connect4BoardUi;
 
+const Connect4Sound = typeof module !== "undefined" && module.exports
+  ? null
+  : globalThis.Connect4Sound;
+
 const {
   ROWS,
   COLS,
@@ -70,6 +74,7 @@ let pendingComputerTimeout = null;
 let experimentLab = null;
 let replayController = null;
 let boardUi = null;
+let soundController = null;
 
 function setStatus(message) {
   const status = document.getElementById("status");
@@ -102,6 +107,18 @@ function animateDrop(row, col, player) {
   return boardUi ? boardUi.animateDrop(row, col, player) : Promise.resolve();
 }
 
+function playDropSound(player) {
+  if (soundController) soundController.playDrop(player);
+}
+
+function playWinSound(player) {
+  if (soundController) soundController.playWin(player);
+}
+
+function playDrawSound() {
+  if (soundController) soundController.playDraw();
+}
+
 function updateColumnButtons() {
   if (boardUi) boardUi.updateColumnButtons();
 }
@@ -121,14 +138,17 @@ async function handleHumanMove(col) {
   renderBoard({ hiddenCell: { row, col } });
   await animateDrop(row, col, HUMAN);
   if (activeToken !== moveToken) return;
+  playDropSound(HUMAN);
 
   const humanWin = checkWin(board, HUMAN);
   if (humanWin.won) {
+    playWinSound(HUMAN);
     finishGame("You win. Red connected four.", humanWin.cells);
     return;
   }
 
   if (isDraw(board)) {
+    playDrawSound();
     finishGame("Draw. The board is full.");
     return;
   }
@@ -162,16 +182,20 @@ async function makeComputerMove(activeToken = moveToken) {
     renderBoard({ hiddenCell: { row, col: result.move } });
     await animateDrop(row, result.move, currentPlayer);
     if (activeToken !== moveToken) return;
+    playDropSound(currentPlayer);
   }
 
   updateStats(result);
 
   const outcome = getWinner(board);
   if (outcome.winner === HUMAN) {
+    playWinSound(HUMAN);
     finishGame(isRedAiEnabled() ? "Red AI wins. Red connected four." : "You win. Red connected four.", outcome.cells);
   } else if (outcome.winner === AI) {
+    playWinSound(AI);
     finishGame("Yellow AI wins. Yellow connected four.", outcome.cells);
   } else if (outcome.winner === EMPTY) {
+    playDrawSound();
     finishGame("Draw. The board is full.");
   } else {
     currentPlayer = currentPlayer === HUMAN ? AI : HUMAN;
@@ -355,6 +379,7 @@ function createReportPdf() {
 }
 
 function initBrowserGame() {
+  soundController = Connect4Sound ? Connect4Sound.createSoundController({ enabledControlId: "soundEnabled" }) : null;
   // Wire modules after the DOM exists so the static file:// page can run without a server.
   boardUi = Connect4BoardUi.createBoardUi({
     getBoard: () => board,
@@ -381,6 +406,7 @@ function initBrowserGame() {
     },
     renderBoard,
     animateDrop,
+    playDropSound,
     setStatus
   });
 

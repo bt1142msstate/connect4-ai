@@ -199,9 +199,11 @@ input:focus-visible {
 }
 
 .status {
-  min-height: 48px;
+  height: 76px;
   margin: 22px 0 18px;
   padding: 14px 16px;
+  display: flex;
+  align-items: center;
   border: 1px solid var(--line);
   border-left: 6px solid var(--felt);
   border-radius: 10px;
@@ -209,6 +211,10 @@ input:focus-visible {
   background: rgba(8, 13, 24, 0.58);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 12px 24px rgba(0, 0, 0, 0.16);
   font-weight: 700;
+  line-height: 1.35;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .board-wrap {
@@ -622,6 +628,7 @@ select option {
 
 .stats-grid div {
   min-width: 0;
+  min-height: 74px;
   padding: 10px;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -634,6 +641,7 @@ select option {
 }
 
 .stats-grid .wide-stat {
+  height: 156px;
   min-height: 156px;
 }
 
@@ -736,7 +744,7 @@ dd {
 }
 
 .replay-description {
-  min-height: 44px;
+  height: 76px;
   margin-bottom: 12px;
   padding: 11px 12px;
   border: 1px solid rgba(45, 212, 191, 0.22);
@@ -746,11 +754,15 @@ dd {
     rgba(9, 18, 30, 0.82);
   color: #c9d7e8;
   line-height: 1.35;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .replay-move-insight {
   display: grid;
   gap: 12px;
+  height: 480px;
   margin-bottom: 14px;
   padding: 13px;
   border: 1px solid rgba(255, 211, 66, 0.24);
@@ -758,6 +770,9 @@ dd {
   background:
     linear-gradient(180deg, rgba(255, 211, 66, 0.1), rgba(255, 255, 255, 0.035)),
     rgba(13, 21, 35, 0.92);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .replay-move-insight[hidden] {
@@ -785,6 +800,7 @@ dd {
 
 .replay-insight-grid div {
   min-width: 0;
+  min-height: 58px;
   padding: 9px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
@@ -794,6 +810,10 @@ dd {
 .replay-insight-grid dd {
   overflow-wrap: normal;
   word-break: normal;
+}
+
+.replay-insight-grid .wide-stat {
+  min-height: 62px;
 }
 
 .replay-field {
@@ -1126,9 +1146,18 @@ th {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  min-height: 40px;
   margin-bottom: 9px;
   color: #d8e6f7;
   font-weight: 800;
+}
+
+#experimentProgressLabel {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.3;
 }
 
 .progress-header strong {
@@ -1154,6 +1183,7 @@ th {
 }
 
 .experiment-summary {
+  height: 96px;
   margin-bottom: 14px;
   padding: 13px 14px;
   border: 1px solid var(--line);
@@ -1161,6 +1191,9 @@ th {
   background: rgba(255, 255, 255, 0.055);
   color: #d8e6f7;
   line-height: 1.45;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .verification-note {

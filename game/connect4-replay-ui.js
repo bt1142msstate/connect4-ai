@@ -29,6 +29,7 @@
     const setWinningCells = options.setWinningCells ?? (() => {});
     const renderBoard = options.renderBoard ?? (() => {});
     const animateDrop = options.animateDrop ?? (() => Promise.resolve());
+    const playDropSound = options.playDropSound ?? (() => {});
     const setStatus = options.setStatus ?? (() => {});
 
     function recordMove(row, col, player, metadata = {}) {
@@ -94,14 +95,26 @@
       if (!panel) return;
 
       const move = replayStep > 0 ? moveHistory[replayStep - 1] : null;
+      const replayReason = document.getElementById("replayMoveReason");
+
       if (!move || !move.search) {
-        panel.hidden = true;
+        panel.hidden = false;
+        replayReason.textContent = move
+          ? "Manual move. No AI search was needed for this turn."
+          : "Move the timeline to an AI turn to see the search explanation.";
+        replayReason.title = replayReason.textContent;
+        document.getElementById("replayInsightPlayer").textContent = move ? formatPlayer(move.player) : "-";
+        document.getElementById("replayInsightAlgorithm").textContent = "-";
+        document.getElementById("replayInsightDepth").textContent = "-";
+        document.getElementById("replayInsightNodes").textContent = "-";
+        document.getElementById("replayInsightTime").textContent = "-";
+        document.getElementById("replayInsightScore").textContent = "-";
+        document.getElementById("replayInsightTies").textContent = "-";
         return;
       }
 
       const search = move.search;
       panel.hidden = false;
-      const replayReason = document.getElementById("replayMoveReason");
       replayReason.textContent = search.reason;
       replayReason.title = search.reason;
       document.getElementById("replayInsightPlayer").textContent = `${formatPlayer(search.player)} AI`;
@@ -188,6 +201,7 @@
         setWinningCells([]);
         renderBoard();
         await animateDrop(move.row, move.col, move.player);
+        playDropSound(move.player);
       }
 
       replayStep = targetStep;

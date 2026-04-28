@@ -81,6 +81,11 @@
             <input type="checkbox" id="showStats" checked>
             <span>Show AI stats</span>
           </label>
+
+          <label class="toggle">
+            <input type="checkbox" id="soundEnabled" checked>
+            <span>Sound effects</span>
+          </label>
         </div>
 
         <button id="resetButton" class="primary-button" type="button">Reset Game</button>
@@ -500,6 +505,7 @@ function runHeadlessSuite(options = {}) {
   <script src="game/connect4-experiment-ui.js"></script>
   <script src="game/connect4-replay-ui.js"></script>
   <script src="game/connect4-board-ui.js"></script>
+  <script src="game/connect4-sound.js"></script>
   <script src="game/connect4-game-controller.js"></script>
 </body>
 </html>

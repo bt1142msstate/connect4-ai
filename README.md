@@ -42,8 +42,9 @@ node script.js --help
 - `connect4-experiment.js` - benchmark setup, experiment evidence, matchup simulations, and export formatting
 - `connect4-experiment-ui.js` - Experiment Lab browser rendering, progress, and download controls
 - `connect4-replay-ui.js` - replay history, scrubber playback, and AI move insight controls
+- `connect4-board-ui.js` - board rendering, column controls, hover preview, keyboard input, and drop animation
 - `connect4-cli.js` - Node command-line runner for headless validation and experiment exports
-- `script.js` - browser game controller, board interactions, and Node exports
+- `script.js` - browser game controller and Node exports
 - `report.html` - technical HTML report
 - `headless-test.js` - optional Node-based validation runner
 - `assets/connect4-ai-full-preview.png` - README preview image

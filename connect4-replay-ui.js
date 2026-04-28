@@ -18,6 +18,7 @@
     let moveHistory = [];
     let replayStep = 0;
     let replayTimer = null;
+    let playbackRunId = 0;
     let finalStatusMessage = "";
     let sidePanelView = "game";
 
@@ -25,6 +26,7 @@
     const setBoard = options.setBoard ?? (() => {});
     const setWinningCells = options.setWinningCells ?? (() => {});
     const renderBoard = options.renderBoard ?? (() => {});
+    const animateDrop = options.animateDrop ?? (() => Promise.resolve());
     const setStatus = options.setStatus ?? (() => {});
 
     function recordMove(row, col, player, metadata = {}) {
@@ -45,6 +47,7 @@
         window.clearTimeout(replayTimer);
         replayTimer = null;
       }
+      playbackRunId += 1;
       const playButton = document.getElementById("replayPlayButton");
       if (playButton) playButton.textContent = "Play";
     }
@@ -58,6 +61,11 @@
       const label = document.getElementById("replaySpeedLabel");
       if (!label) return;
       label.textContent = `${(getSpeedMs() / 1000).toFixed(2)} s / move`;
+    }
+
+    function replayAnimationsEnabled() {
+      const checkbox = document.getElementById("replayAnimations");
+      return !checkbox || checkbox.checked;
     }
 
     function getDescription() {
@@ -155,32 +163,51 @@
       updateSpeedLabel();
     }
 
-    function showStep(step, options = {}) {
+    async function showStep(step, options = {}) {
       if (!options.keepPlaying) {
         stopPlayback();
       }
-      replayStep = Math.min(Math.max(Number(step), 0), moveHistory.length);
+      const targetStep = Math.min(Math.max(Number(step), 0), moveHistory.length);
+      const previousStep = replayStep;
+      const shouldAnimate = options.animate !== false
+        && replayAnimationsEnabled()
+        && targetStep === previousStep + 1
+        && targetStep > 0;
       const replayBoard = buildBoardFromMoves(replayStep);
-      const outcome = getWinner(replayBoard);
-      setBoard(replayBoard);
+      const finalBoard = buildBoardFromMoves(targetStep);
+      const outcome = getWinner(finalBoard);
+
+      if (shouldAnimate) {
+        const move = moveHistory[targetStep - 1];
+        setBoard(replayBoard);
+        setWinningCells([]);
+        renderBoard();
+        await animateDrop(move.row, move.col, move.player);
+      }
+
+      replayStep = targetStep;
+      setBoard(finalBoard);
       setWinningCells(outcome.winner === HUMAN || outcome.winner === AI ? outcome.cells : []);
       renderBoard();
       updateControls();
       setStatus(`Replay: ${getDescription()}`);
     }
 
-    function scheduleAdvance() {
-      replayTimer = window.setTimeout(() => {
+    function scheduleAdvance(runId) {
+      replayTimer = window.setTimeout(async () => {
+        replayTimer = null;
+        if (runId !== playbackRunId) return;
         if (replayStep >= moveHistory.length) {
           stopPlayback();
           return;
         }
-        showStep(replayStep + 1, { keepPlaying: true });
+        await showStep(replayStep + 1, { keepPlaying: true });
+        if (runId !== playbackRunId) return;
         if (replayStep >= moveHistory.length) {
           stopPlayback();
           return;
         }
-        scheduleAdvance();
+        scheduleAdvance(runId);
       }, getSpeedMs());
     }
 
@@ -191,10 +218,12 @@
         return;
       }
       if (replayStep >= moveHistory.length) {
-        showStep(0, { keepPlaying: true });
+        showStep(0, { keepPlaying: true, animate: false });
       }
+      playbackRunId += 1;
+      const runId = playbackRunId;
       document.getElementById("replayPlayButton").textContent = "Pause";
-      scheduleAdvance();
+      scheduleAdvance(runId);
     }
 
     function finishGame(message) {

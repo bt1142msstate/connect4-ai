@@ -830,6 +830,19 @@ dd {
   font-size: 0.82rem;
 }
 
+.replay-animation-row {
+  margin-top: 12px;
+  padding: 10px 0 2px;
+}
+
+.replay-animation-row strong {
+  font-size: 0.9rem;
+}
+
+.replay-animation-row small {
+  font-size: 0.76rem;
+}
+
 .table-wrap {
   overflow-x: auto;
   margin-top: 12px;

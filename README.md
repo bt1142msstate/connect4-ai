@@ -10,6 +10,7 @@ A local browser-based Connect 4 game with a depth-limited minimax opponent, alph
 
 Open `index.html` in a browser. No server or package install is required for gameplay.
 After a game ends, the side panel's Replay tab lets you scrub through every move, step backward or forward one move at a time, or play the whole game back at a selected speed. AI moves include the reason, depth, algorithm, nodes searched, score, and move time.
+Replay can animate each forward move dropping into the board, and the Replay tab includes a toggle to turn those animations off.
 Use the How It Works button for an in-app walkthrough of the board model, rules, minimax search, pruning, heuristic, and validation flow. Each walkthrough card includes an expandable code snippet for the relevant functions.
 
 ## Report
@@ -29,9 +30,9 @@ The headless runner checks Connect 4 rules, invalid and full-column rejection, m
 Additional CLI evidence exports:
 
 ```bash
-node script.js --headless --red-depth=2 --yellow-depth=6 --games=6 --format=summary
-node script.js --experiment --board=midgame --max-depth=6 --format=csv --out=experiment.csv
-node script.js --help
+node connect4-game-controller.js --headless --red-depth=2 --yellow-depth=6 --games=6 --format=summary
+node connect4-game-controller.js --experiment --board=midgame --max-depth=6 --format=csv --out=experiment.csv
+node connect4-game-controller.js --help
 ```
 
 ## Files
@@ -44,7 +45,7 @@ node script.js --help
 - `connect4-replay-ui.js` - replay history, scrubber playback, and AI move insight controls
 - `connect4-board-ui.js` - board rendering, column controls, hover preview, keyboard input, and drop animation
 - `connect4-cli.js` - Node command-line runner for headless validation and experiment exports
-- `script.js` - browser game controller and Node exports
+- `connect4-game-controller.js` - browser game controller and Node exports
 - `report.html` - technical HTML report
 - `headless-test.js` - optional Node-based validation runner
 - `assets/connect4-ai-full-preview.png` - README preview image

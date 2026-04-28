@@ -84,18 +84,18 @@
     process.stdout.write(`Connect 4 AI headless commands
 
 Validation suite:
-  node script.js --headless [--depth=4] [--red-depth=2] [--yellow-depth=6] [--games=4]
+  node connect4-game-controller.js --headless [--depth=4] [--red-depth=2] [--yellow-depth=6] [--games=4]
                  [--plain-minimax] [--variety] [--alternate-start] [--seed=42]
                  [--format=json|summary] [--out=path]
 
 Experiment evidence:
-  node script.js --experiment [--board=empty|midgame|current] [--max-depth=5]
+  node connect4-game-controller.js --experiment [--board=empty|midgame|current] [--max-depth=5]
                  [--validation-games=4] [--no-tie-variation] [--no-matchups]
                  [--format=json|csv|summary] [--out=path]
 
 Examples:
-  node script.js --headless --red-depth=2 --yellow-depth=6 --games=6 --format=summary
-  node script.js --experiment --board=midgame --max-depth=6 --format=csv --out=experiment.csv
+  node connect4-game-controller.js --headless --red-depth=2 --yellow-depth=6 --games=6 --format=summary
+  node connect4-game-controller.js --experiment --board=midgame --max-depth=6 --format=csv --out=experiment.csv
 `);
   }
 

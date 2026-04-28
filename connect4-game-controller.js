@@ -371,6 +371,7 @@ function initBrowserGame() {
       winningCells = cells;
     },
     renderBoard,
+    animateDrop,
     setStatus
   });
 

@@ -75,8 +75,8 @@
           <code>connect4-engine.js</code>. Experiment evidence generation lives in <code>connect4-experiment.js</code>,
           the Experiment Lab UI lives in <code>connect4-experiment-ui.js</code>, replay controls live in
           <code>connect4-replay-ui.js</code>, board rendering lives in <code>connect4-board-ui.js</code>,
-          <code>connect4-cli.js</code> handles Node commands, and <code>script.js</code> handles the browser game
-          controller.
+          <code>connect4-cli.js</code> handles Node commands, and <code>connect4-game-controller.js</code> handles the
+          browser game controller.
         </p>
       </article>
 
@@ -219,8 +219,8 @@
         <h2>Testing Commands</h2>
         <div class="command-list">
           <code>node headless-test.js</code>
-          <code>node script.js --headless --red-depth=2 --yellow-depth=6 --games=6 --format=summary</code>
-          <code>node script.js --experiment --board=midgame --max-depth=6 --format=csv --out=experiment.csv</code>
+          <code>node connect4-game-controller.js --headless --red-depth=2 --yellow-depth=6 --games=6 --format=summary</code>
+          <code>node connect4-game-controller.js --experiment --board=midgame --max-depth=6 --format=csv --out=experiment.csv</code>
         </div>
       </article>
 

@@ -191,6 +191,15 @@
           <strong id="replaySpeedLabel">0.70 s / move</strong>
           <span>Slow</span>
         </div>
+
+        <label class="switch-row replay-animation-row">
+          <span>
+            <strong>Animate Replay</strong>
+            <small>Show each forward replay move dropping into place.</small>
+          </span>
+          <input type="checkbox" id="replayAnimations" checked>
+          <span class="switch-ui" aria-hidden="true"></span>
+        </label>
       </section>
     </aside>
   </main>
@@ -490,6 +499,6 @@ function runHeadlessSuite(options = {}) {
   <script src="connect4-experiment-ui.js"></script>
   <script src="connect4-replay-ui.js"></script>
   <script src="connect4-board-ui.js"></script>
-  <script src="script.js"></script>
+  <script src="connect4-game-controller.js"></script>
 </body>
 </html>

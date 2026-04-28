@@ -63,6 +63,8 @@ const {
   experimentToCsv
 } = Connect4Experiment;
 
+const MAX_LIVE_PLAIN_MINIMAX_DEPTH = 7;
+
 // Live game state stays in this controller; helper modules read it through callbacks.
 let board = createBoard();
 let gameOver = false;
@@ -165,8 +167,8 @@ async function makeComputerMove(activeToken = moveToken) {
   // A token prevents delayed AI moves from landing after reset or replay state changes.
   if (activeToken !== moveToken) return;
   pendingComputerTimeout = null;
-  const depth = getDepthForPlayer(currentPlayer);
   const useAlphaBeta = document.getElementById("useAlphaBeta").checked;
+  const depth = getSearchDepthForPlayer(currentPlayer, useAlphaBeta);
   const searchState = copyBoard(board);
   const result = withComputerMoveExplanation(
     searchState,
@@ -259,6 +261,11 @@ function isRedAiEnabled() {
 function getDepthForPlayer(player) {
   const id = player === HUMAN ? "redDifficulty" : "difficulty";
   return Number(document.getElementById(id).value);
+}
+
+function getSearchDepthForPlayer(player, useAlphaBeta) {
+  const depth = getDepthForPlayer(player);
+  return useAlphaBeta ? depth : Math.min(depth, MAX_LIVE_PLAIN_MINIMAX_DEPTH);
 }
 
 function shouldComputerPlayCurrentTurn() {

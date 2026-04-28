@@ -38,14 +38,22 @@
       return getOpenRow(getBoard(), hoverColumn);
     }
 
+    function syncBoardInteractivity() {
+      const boardElement = document.getElementById("board");
+      if (!boardElement) return;
+      boardElement.classList.toggle("manual-drop-turn", isManualHumanTurn());
+    }
+
     function render(renderOptions = {}) {
       // Rebuild all 42 cells from state, then let CSS handle pieces and highlights.
       const board = getBoard();
       const boardElement = document.getElementById("board");
       boardElement.innerHTML = "";
+      syncBoardInteractivity();
       const winSet = new Set(getWinningCells().map(([row, col]) => `${row},${col}`));
       const hiddenCell = renderOptions.hiddenCell ? `${renderOptions.hiddenCell.row},${renderOptions.hiddenCell.col}` : null;
       const ghostRow = getGhostRow();
+      const manualTurn = isManualHumanTurn();
 
       for (let row = 0; row < ROWS; row += 1) {
         for (let col = 0; col < COLS; col += 1) {
@@ -61,6 +69,10 @@
               cell.classList.add("ghost", "red");
               cell.setAttribute("aria-label", `Preview red piece in column ${col + 1}`);
             }
+          }
+          if (manualTurn && board[0][col] === EMPTY) {
+            cell.classList.add("drop-target");
+            if (hoverColumn === col) cell.classList.add("column-hover");
           }
           if (winSet.has(`${row},${col}`)) cell.classList.add("win");
           boardElement.appendChild(cell);
@@ -168,6 +180,7 @@
     }
 
     function updateColumnButtons() {
+      syncBoardInteractivity();
       const board = getBoard();
       const buttons = document.querySelectorAll(".column-button");
       buttons.forEach((button, col) => {

@@ -4,7 +4,7 @@
 
 A local browser-based Connect 4 game with a depth-limited minimax opponent, alpha-beta pruning, heuristic evaluation, AI move explanations, replay controls, optional sound effects, and headless validation.
 
-Difficulty settings run from Easy depth 2 through Impossible depth 8. Impossible is the strongest practical browser setting in this project, not a mathematically solved Connect 4 oracle.
+Difficulty settings run from Easy depth 2 through Good Luck depth 8. Good Luck is the strongest practical browser setting in this project, not a mathematically solved Connect 4 oracle.
 
 ![Connect 4 AI full interface preview](assets/connect4-ai-full-preview.png)
 

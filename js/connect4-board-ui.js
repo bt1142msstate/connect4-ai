@@ -1,3 +1,4 @@
+// Browser board renderer and input layer for cells, column buttons, ghost preview, and drops.
 (function attachConnect4BoardUi(root) {
   const engine = typeof module !== "undefined" && module.exports
     ? require("./connect4-engine.js")

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+<!-- Technical report page for the local Connect 4 AI project. It shares the main app stylesheet. -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Connect 4 AI Report</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="report-body">
   <main class="report-page">
@@ -49,7 +50,8 @@
           human side and yellow is the AI side. The app validates legal moves, prevents drops into full columns, applies
           gravity to the lowest open row, detects horizontal, vertical, and both diagonal wins, detects natural draws,
           and resets the game. It also includes red Autopilot with its own difficulty setting, a yellow AI opponent,
-          post-game replay controls, an Experiment Lab, downloadable experiment results, and a Node headless test runner.
+          post-game replay controls with optional drop animations, an Experiment Lab, downloadable experiment results,
+          and a Node headless test runner.
         </p>
       </article>
 
@@ -62,6 +64,7 @@
           <div>Alpha-beta pruning with move, node, runtime, algorithm, and depth stats</div>
           <div>Heuristic scoring for wins, threats, open spaces, and center control</div>
           <div>Easy, Medium, Hard, and Expert settings for both AI sides</div>
+          <div>Replay mode with move-by-move scrubbing, animated drops, and a no-animation toggle</div>
           <div>Experiment Lab with JSON, CSV, and text evidence exports</div>
           <div>Headless Node tests for game rules, search behavior, and AI matchups</div>
         </div>
@@ -71,12 +74,12 @@
         <h2>How to Run</h2>
         <p>
           The game runs by opening <code>index.html</code>; no server or internet connection is required. Optional
-          validation runs with <code>node headless-test.js</code>. The reusable board rules and AI search live in
-          <code>connect4-engine.js</code>. Experiment evidence generation lives in <code>connect4-experiment.js</code>,
-          the Experiment Lab UI lives in <code>connect4-experiment-ui.js</code>, replay controls live in
-          <code>connect4-replay-ui.js</code>, board rendering lives in <code>connect4-board-ui.js</code>,
-          <code>connect4-cli.js</code> handles Node commands, and <code>connect4-game-controller.js</code> handles the
-          browser game controller.
+          validation runs with <code>node tests/headless-test.js</code>. The reusable board rules and AI search live in
+          <code>js/connect4-engine.js</code>. Experiment evidence generation lives in <code>js/connect4-experiment.js</code>,
+          the Experiment Lab UI lives in <code>js/connect4-experiment-ui.js</code>, replay controls live in
+          <code>js/connect4-replay-ui.js</code>, board rendering lives in <code>js/connect4-board-ui.js</code>,
+          <code>js/connect4-cli.js</code> handles Node commands, and <code>js/connect4-game-controller.js</code>
+          handles the browser game controller.
         </p>
       </article>
 
@@ -218,9 +221,9 @@
       <article class="report-section span-2">
         <h2>Testing Commands</h2>
         <div class="command-list">
-          <code>node headless-test.js</code>
-          <code>node connect4-game-controller.js --headless --red-depth=2 --yellow-depth=6 --games=6 --format=summary</code>
-          <code>node connect4-game-controller.js --experiment --board=midgame --max-depth=6 --format=csv --out=experiment.csv</code>
+          <code>node tests/headless-test.js</code>
+          <code>node js/connect4-game-controller.js --headless --red-depth=2 --yellow-depth=6 --games=6 --format=summary</code>
+          <code>node js/connect4-game-controller.js --experiment --board=midgame --max-depth=6 --format=csv --out=experiment.csv</code>
         </div>
       </article>
 

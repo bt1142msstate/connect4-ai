@@ -1,3 +1,4 @@
+// Builds repeatable minimax/alpha-beta benchmark evidence for browser and Node use.
 (function attachConnect4Experiment(root) {
   const engine = typeof module !== "undefined" && module.exports
     ? require("./connect4-engine.js")

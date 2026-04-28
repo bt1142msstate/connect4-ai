@@ -1,3 +1,4 @@
+// Shared Connect 4 rules, minimax search, heuristic scoring, and headless validation.
 (function attachConnect4Engine(root) {
   const ROWS = 6;
   const COLS = 7;

@@ -1,4 +1,5 @@
-const connect4 = require("./connect4-engine.js");
+// CLI smoke test wrapper for the reusable Connect 4 engine validation suite.
+const connect4 = require("../js/connect4-engine.js");
 
 const depthArg = process.argv.find((arg) => arg.startsWith("--depth="));
 const redDepthArg = process.argv.find((arg) => arg.startsWith("--red-depth="));

@@ -1,3 +1,4 @@
+// Live game controller that coordinates engine state, board UI, replay, and experiment UI.
 const Connect4Engine = typeof module !== "undefined" && module.exports
   ? require("./connect4-engine.js")
   : globalThis.Connect4Engine;

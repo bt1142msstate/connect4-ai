@@ -1,3 +1,4 @@
+// Browser Experiment Lab controller: progress, rendering, and JSON/CSV/text downloads.
 (function attachConnect4ExperimentUi(root) {
   const engine = typeof module !== "undefined" && module.exports
     ? require("./connect4-engine.js")

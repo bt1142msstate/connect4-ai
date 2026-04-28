@@ -1,3 +1,4 @@
+// Browser replay controller for move history, playback, and per-move AI explanations.
 (function attachConnect4ReplayUi(root) {
   const engine = typeof module !== "undefined" && module.exports
     ? require("./connect4-engine.js")

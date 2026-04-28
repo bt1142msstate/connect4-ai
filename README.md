@@ -22,7 +22,7 @@ Open `report.html` for a short technical write-up. Use the Create PDF button to 
 If Node.js is available, run:
 
 ```bash
-node headless-test.js
+node tests/headless-test.js
 ```
 
 The headless runner checks Connect 4 rules, invalid and full-column rejection, move ordering, win/draw detection, red minimizer behavior, depth-adjusted terminal scoring, alpha-beta consistency, tie variation, and uneven-depth AI matchups.
@@ -30,24 +30,24 @@ The headless runner checks Connect 4 rules, invalid and full-column rejection, m
 Additional CLI evidence exports:
 
 ```bash
-node connect4-game-controller.js --headless --red-depth=2 --yellow-depth=6 --games=6 --format=summary
-node connect4-game-controller.js --experiment --board=midgame --max-depth=6 --format=csv --out=experiment.csv
-node connect4-game-controller.js --help
+node js/connect4-game-controller.js --headless --red-depth=2 --yellow-depth=6 --games=6 --format=summary
+node js/connect4-game-controller.js --experiment --board=midgame --max-depth=6 --format=csv --out=experiment.csv
+node js/connect4-game-controller.js --help
 ```
 
-## Files
+## Project Layout
 
 - `index.html` - local browser game
-- `style.css` - dark responsive styling
-- `connect4-engine.js` - board rules, minimax, alpha-beta, heuristic scoring, and headless validation
-- `connect4-experiment.js` - benchmark setup, experiment evidence, matchup simulations, and export formatting
-- `connect4-experiment-ui.js` - Experiment Lab browser rendering, progress, and download controls
-- `connect4-replay-ui.js` - replay history, scrubber playback, and AI move insight controls
-- `connect4-board-ui.js` - board rendering, column controls, hover preview, keyboard input, and drop animation
-- `connect4-cli.js` - Node command-line runner for headless validation and experiment exports
-- `connect4-game-controller.js` - browser game controller and Node exports
 - `report.html` - technical HTML report
-- `headless-test.js` - optional Node-based validation runner
+- `css/style.css` - dark responsive styling shared by the game and report
+- `js/connect4-engine.js` - board rules, minimax, alpha-beta, heuristic scoring, and headless validation
+- `js/connect4-experiment.js` - benchmark setup, experiment evidence, matchup simulations, and export formatting
+- `js/connect4-experiment-ui.js` - Experiment Lab browser rendering, progress, and download controls
+- `js/connect4-replay-ui.js` - replay history, scrubber playback, replay animation, and AI move insight controls
+- `js/connect4-board-ui.js` - board rendering, column controls, hover preview, keyboard input, and drop animation
+- `js/connect4-cli.js` - Node command-line runner for headless validation and experiment exports
+- `js/connect4-game-controller.js` - browser game controller and Node exports
+- `tests/headless-test.js` - optional Node-based validation runner
 - `assets/connect4-ai-full-preview.png` - README preview image
 
 ## License

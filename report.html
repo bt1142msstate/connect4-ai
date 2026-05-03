@@ -17,6 +17,7 @@
 
       <p class="eyebrow">Adversarial Search Project</p>
       <h1>Connect 4 AI Report</h1>
+      <p class="report-author">Brandon Temple | NetID: bt1142 | April 28, 2026</p>
       <p class="report-lede">
         I built a local browser game that demonstrates depth-limited minimax, alpha-beta pruning, heuristic
         evaluation, adjustable difficulty, Autopilot, experiments, and headless testing.
@@ -222,6 +223,23 @@
           <code>node checks/headless-test.js</code>
           <code>node game/connect4-game-controller.js --headless --red-depth=2 --yellow-depth=6 --games=6 --format=summary</code>
           <code>node game/connect4-game-controller.js --experiment --board=midgame --max-depth=6 --format=csv --out=experiment.csv</code>
+        </div>
+      </article>
+
+      <article class="report-section span-2">
+        <h2>Sources and Libraries</h2>
+        <p>
+          The Connect 4 rules, minimax search, alpha-beta pruning, heuristic scoring, replay, and experiment code are
+          custom vanilla JavaScript. I did not use a game engine or a Connect 4/minimax library. The project uses
+          standard browser APIs for the local interface and sound, plus Node.js for the optional headless validation
+          runner. The adversarial-search concepts come from the CS 4633/6633 course material on minimax, alpha-beta
+          pruning, and heuristic evaluation.
+        </p>
+        <div class="source-list">
+          <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model">MDN: Document Object Model</a>
+          <a href="https://developer.mozilla.org/en-US/docs/Web/CSS">MDN: CSS</a>
+          <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API">MDN: Web Audio API</a>
+          <a href="https://nodejs.org/api/">Node.js Documentation</a>
         </div>
       </article>
 

@@ -5,6 +5,12 @@ Thumbs.db
 deliverables/
 evidence/
 docs/
+submission/
+presentation-workspace/
+connect4-ai-submission.zip
+*.pptx
+*.mp4
+*.pdf
 
 # Local experiment exports
 *.csv

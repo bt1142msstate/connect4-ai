@@ -229,17 +229,19 @@
       <article class="report-section span-2">
         <h2>Sources and Libraries</h2>
         <p>
-          The Connect 4 rules, minimax search, alpha-beta pruning, heuristic scoring, replay, and experiment code are
-          custom vanilla JavaScript. I did not use a game engine or a Connect 4/minimax library. The project uses
-          standard browser APIs for the local interface and sound, plus Node.js for the optional headless validation
-          runner. The adversarial-search concepts come from the CS 4633/6633 course material on minimax, alpha-beta
-          pruning, and heuristic evaluation.
+          The main algorithm sources were the CS 4633/6633 lecture notes. The implementation is custom vanilla
+          JavaScript; I did not use a game engine or a Connect 4/minimax library. Browser documentation was used only
+          for standard HTML/CSS/DOM behavior, browser-generated sound, and the optional Node.js headless runner.
         </p>
         <div class="source-list">
-          <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model">MDN: Document Object Model</a>
-          <a href="https://developer.mozilla.org/en-US/docs/Web/CSS">MDN: CSS</a>
-          <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API">MDN: Web Audio API</a>
-          <a href="https://nodejs.org/api/">Node.js Documentation</a>
+          <div><strong>Lecture 16: Search algorithms for two-player games</strong><span>AI16AdversarialSearch.pdf; minimax, MAX/MIN players, alpha-beta pruning, depth-limited search, and static evaluation.</span></div>
+          <div><strong>Lecture 13: Introduction to state-space search</strong><span>AI13StateSpaceSearch.pdf; states, legal actions, successor generation, and terminal-state checks.</span></div>
+          <div><strong>Lecture 18: Game tree search continued</strong><span>AI18MonteCarlo.pdf; game-tree search context, evaluation functions, and comparison to Monte Carlo Tree Search.</span></div>
+          <div><strong>Lecture 1: Course introduction and overview</strong><span>AI01Intro.pdf; framing the project as classical problem-solving search.</span></div>
+          <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model"><strong>MDN: Document Object Model</strong><span>Browser page structure and event-driven interaction.</span></a>
+          <a href="https://developer.mozilla.org/en-US/docs/Web/CSS"><strong>MDN: CSS</strong><span>Layout, responsive styling, and visual presentation.</span></a>
+          <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API"><strong>MDN: Web Audio API</strong><span>Browser-generated sound effects.</span></a>
+          <a href="https://nodejs.org/api/"><strong>Node.js Documentation</strong><span>Headless validation runner and command-line test output.</span></a>
         </div>
       </article>
 

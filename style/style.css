@@ -1685,7 +1685,8 @@ th {
   margin-top: 12px;
 }
 
-.source-list a {
+.source-list a,
+.source-list div {
   display: block;
   padding: 10px 12px;
   border: 1px solid var(--line);
@@ -1694,6 +1695,22 @@ th {
   color: #ffffff;
   font-weight: 800;
   text-decoration: none;
+}
+
+.source-list strong {
+  display: block;
+  color: #ffffff;
+  font-size: 0.86rem;
+  line-height: 1.25;
+}
+
+.source-list span {
+  display: block;
+  margin-top: 4px;
+  color: #d8cfd2;
+  font-size: 0.76rem;
+  font-weight: 600;
+  line-height: 1.35;
 }
 
 .source-list a:hover {
@@ -2028,10 +2045,20 @@ th {
     margin-top: 7px;
   }
 
-  .source-list a {
+  .source-list a,
+  .source-list div {
     padding: 7px 8px;
     border-radius: 6px;
+  }
+
+  .source-list strong {
     font-size: 0.72rem;
+  }
+
+  .source-list span {
+    margin-top: 2px;
+    font-size: 0.62rem;
+    line-height: 1.25;
   }
 
   .table-wrap {

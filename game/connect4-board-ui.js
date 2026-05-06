@@ -195,7 +195,7 @@
     }
 
     function getClosestColumnFromPointer(event) {
-      const boardElement = event.currentTarget;
+      const boardElement = event.currentTarget || document.getElementById("board");
       if (!boardElement) return null;
 
       let closestColumn = null;
@@ -224,6 +224,11 @@
       setHoverColumn(col);
     }
 
+    function handleBoardTouch(event) {
+      if (!event.touches || event.touches.length === 0) return;
+      handleBoardPointer(event.touches[0]);
+    }
+
     function handleBoardClick(event) {
       const col = getClosestColumnFromPointer(event);
       if (col !== null) {
@@ -248,6 +253,10 @@
       createColumnControls();
       const boardElement = document.getElementById("board");
       boardElement.addEventListener("mousemove", handleBoardPointer);
+      boardElement.addEventListener("touchstart", handleBoardTouch, { passive: true });
+      boardElement.addEventListener("touchmove", handleBoardTouch, { passive: true });
+      boardElement.addEventListener("touchend", () => clearHoverColumn());
+      boardElement.addEventListener("touchcancel", () => clearHoverColumn());
       boardElement.addEventListener("click", handleBoardClick);
       boardElement.addEventListener("mouseleave", clearHoverColumn);
       document.addEventListener("keydown", handleKeyboardDrop);
@@ -263,6 +272,7 @@
       clearHoverColumn,
       getClosestColumnFromPointer,
       handleBoardPointer,
+      handleBoardTouch,
       handleBoardClick,
       handleKeyboardDrop,
       bindEvents

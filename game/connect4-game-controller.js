@@ -387,6 +387,7 @@ function createReportPdf() {
 
 function initBrowserGame() {
   soundController = Connect4Sound ? Connect4Sound.createSoundController({ enabledControlId: "soundEnabled" }) : null;
+  if (soundController) soundController.bindUnlockEvents(document);
   // Wire modules after the DOM exists so the static file:// page can run without a server.
   boardUi = Connect4BoardUi.createBoardUi({
     getBoard: () => board,

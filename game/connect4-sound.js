@@ -5,6 +5,8 @@
 
   function createSoundController(options = {}) {
     let audioContext = null;
+    let unlockPrimed = false;
+    let unlockBound = false;
     const enabledControlId = options.enabledControlId ?? "soundEnabled";
 
     function isEnabled() {
@@ -20,6 +22,43 @@
       if (!audioContext) audioContext = new AudioContextClass();
       if (audioContext.state === "suspended") audioContext.resume().catch(() => {});
       return audioContext;
+    }
+
+    function unlock() {
+      const context = getContext();
+      if (!context) return false;
+
+      // Mobile browsers usually require audio to be started from the first tap.
+      // A one-sample silent source primes the context without making a sound.
+      if (!unlockPrimed || context.state === "suspended") {
+        try {
+          const source = context.createBufferSource();
+          source.buffer = context.createBuffer(1, 1, context.sampleRate);
+          source.connect(context.destination);
+          source.start(0);
+          unlockPrimed = true;
+        } catch {
+          // Some browsers already consider the context unlocked; tone playback will confirm it.
+        }
+      }
+
+      if (context.state === "suspended") {
+        context.resume().catch(() => {});
+      }
+
+      return context.state === "running";
+    }
+
+    function bindUnlockEvents(target) {
+      const eventTarget = target ?? (typeof document !== "undefined" ? document : null);
+      if (!eventTarget || unlockBound) return;
+      unlockBound = true;
+      const unlockFromGesture = () => unlock();
+      eventTarget.addEventListener("pointerdown", unlockFromGesture, { passive: true });
+      eventTarget.addEventListener("touchstart", unlockFromGesture, { passive: true });
+      eventTarget.addEventListener("mousedown", unlockFromGesture);
+      eventTarget.addEventListener("click", unlockFromGesture);
+      eventTarget.addEventListener("keydown", unlockFromGesture);
     }
 
     function tone(frequency, startOffset, duration, type = "sine", volume = VOLUME) {
@@ -61,6 +100,8 @@
 
     return {
       isEnabled,
+      unlock,
+      bindUnlockEvents,
       playDrop,
       playWin,
       playDraw

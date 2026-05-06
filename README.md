@@ -25,14 +25,15 @@ Open `report.html` for a short technical write-up. Use the Create PDF button to 
 If Node.js is available, run:
 
 ```bash
-node checks/headless-test.js
+npm test
 ```
 
-The headless runner checks Connect 4 rules, invalid and full-column rejection, move ordering, win/draw detection, red minimizer behavior, depth-adjusted terminal scoring, alpha-beta consistency, tie variation, and uneven-depth AI matchups.
+The `npm test` script runs the same reusable headless runner used for local validation and GitHub Actions. It checks Connect 4 rules, invalid and full-column rejection, move ordering, win/draw detection, red minimizer behavior, depth-adjusted terminal scoring, alpha-beta consistency, tie variation, tactical shortcut behavior, and uneven-depth AI matchups.
 
 Additional CLI evidence exports:
 
 ```bash
+node checks/headless-test.js
 node game/connect4-game-controller.js --headless --red-depth=2 --yellow-depth=6 --games=6 --format=summary
 node game/connect4-game-controller.js --experiment --board=midgame --max-depth=6 --format=csv --out=experiment.csv
 node game/connect4-game-controller.js --help
@@ -46,6 +47,7 @@ node game/connect4-game-controller.js --help
 - `game/` - Connect 4 rules, minimax search, alpha-beta pruning, board display, replay, Experiment Lab, and command-line exports
 - `checks/` - optional Node-based validation runner
 - `assets/` - README preview image
+- `.github/workflows/` - GitHub Actions workflow for the headless validation suite
 
 The main game modules are separated by responsibility: `connect4-engine.js` handles rules and search, `connect4-board-ui.js` draws the board, `connect4-game-controller.js` coordinates live play, `connect4-replay-ui.js` handles replay, `connect4-sound.js` creates browser sound effects, `connect4-experiment.js` builds evidence, `connect4-experiment-ui.js` renders the lab, and `connect4-cli.js` powers headless commands.
 

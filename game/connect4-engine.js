@@ -278,8 +278,10 @@
     let alpha = -Infinity;
     let beta = Infinity;
 
-    const tacticalResult = createTacticalRootResult(state, depth, useAlphaBeta, player, legalMoves, start);
-    if (tacticalResult) return tacticalResult;
+    if (!options.disableTacticalShortcut) {
+      const tacticalResult = createTacticalRootResult(state, depth, useAlphaBeta, player, legalMoves, start);
+      if (tacticalResult) return tacticalResult;
+    }
 
     for (const col of legalMoves) {
       const next = copyBoard(state);
@@ -327,8 +329,8 @@
     return chooseRootMove(state, depth, useAlphaBeta, player, options);
   }
 
-  function chooseAiMove(state, depth, useAlphaBeta) {
-    return chooseRootMove(state, depth, useAlphaBeta, AI);
+  function chooseAiMove(state, depth, useAlphaBeta, options = {}) {
+    return chooseRootMove(state, depth, useAlphaBeta, AI, options);
   }
 
   function createSeededRandom(seed) {
@@ -622,6 +624,16 @@
       passed: tacticalBlock.move === 3
         && tacticalBlock.nodes <= getLegalMoves(state).length + 1
         && tacticalBlock.reason.includes("one-ply tactical check")
+    });
+    const pureBlock = chooseComputerMove(state, 4, useAlphaBeta, AI, {
+      randomizeTies: false,
+      disableTacticalShortcut: true
+    });
+    checks.push({
+      name: "pure benchmark mode can disable tactical shortcut",
+      passed: pureBlock.move === 3
+        && pureBlock.tactical === undefined
+        && pureBlock.nodes > tacticalBlock.nodes
     });
 
     state = createBoard();

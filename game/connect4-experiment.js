@@ -58,10 +58,11 @@
 
   function runBenchmarkOnState(state, depths = [3, 4, 5]) {
     // For each depth, compare plain minimax against alpha-beta on the same board.
+    const benchmarkOptions = { disableTacticalShortcut: true };
     const rows = [];
     for (const depth of depths) {
-      rows.push(chooseAiMove(state, depth, false));
-      rows.push(chooseAiMove(state, depth, true));
+      rows.push(chooseAiMove(state, depth, false, benchmarkOptions));
+      rows.push(chooseAiMove(state, depth, true, benchmarkOptions));
     }
     return rows;
   }
@@ -122,8 +123,9 @@
 
   function compareDepth(snapshot, depth) {
     // Correct alpha-beta should match plain minimax while searching fewer or equal nodes.
-    const plain = chooseAiMove(snapshot, depth, false);
-    const pruned = chooseAiMove(snapshot, depth, true);
+    const benchmarkOptions = { disableTacticalShortcut: true };
+    const plain = chooseAiMove(snapshot, depth, false, benchmarkOptions);
+    const pruned = chooseAiMove(snapshot, depth, true, benchmarkOptions);
 
     return {
       depth,
@@ -232,9 +234,9 @@
 
     for (const depth of depths) {
       await advance(`Running plain minimax at depth ${depth}...`);
-      const plain = chooseAiMove(boardSnapshot.state, depth, false);
+      const plain = chooseAiMove(boardSnapshot.state, depth, false, { disableTacticalShortcut: true });
       await advance(`Running alpha-beta at depth ${depth}...`, 1);
-      const pruned = chooseAiMove(boardSnapshot.state, depth, true);
+      const pruned = chooseAiMove(boardSnapshot.state, depth, true, { disableTacticalShortcut: true });
       comparisons.push({
         depth,
         plain,
@@ -360,6 +362,7 @@
       `AI matchup checks: ${result.config.includeMatchups ? "enabled" : "disabled"}`,
       `Player context: ${result.currentPlayer}`,
       `Legal moves in board snapshot: ${result.legalMoves.join(", ") || "none"}`,
+      "Benchmark mode: one-ply tactical shortcuts are disabled for plain minimax vs alpha-beta comparisons.",
       "",
       "Main claim:",
       result.conclusion,

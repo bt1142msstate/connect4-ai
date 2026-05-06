@@ -1,0 +1,12 @@
+{
+  "name": "connect4-ai",
+  "version": "1.0.0",
+  "private": false,
+  "description": "Local browser Connect 4 game with depth-limited minimax, alpha-beta pruning, heuristic scoring, replay, and headless validation.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node checks/headless-test.js --depth=4 --games=2 --alternate-start --seed=4633",
+    "test:plain": "node checks/headless-test.js --plain-minimax --depth=4 --games=1 --seed=4633",
+    "experiment": "node game/connect4-game-controller.js --experiment --board=midgame --max-depth=6 --format=summary"
+  }
+}

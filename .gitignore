@@ -15,5 +15,6 @@ connect4-ai-submission.zip
 # Local experiment exports
 *.csv
 *.json
+!package.json
 *.log
 *.out

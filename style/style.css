@@ -907,6 +907,8 @@ dd {
 .table-wrap {
   overflow-x: auto;
   margin-top: 12px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 table {
@@ -1442,10 +1444,12 @@ th {
   width: min(1080px, calc(100vw - 32px));
   margin: 0 auto;
   padding: 30px 0 56px;
+  min-width: 0;
 }
 
 .report-hero,
 .report-section {
+  min-width: 0;
   background:
     linear-gradient(180deg, rgba(24, 31, 42, 0.94), rgba(13, 16, 23, 0.96)),
     rgba(18, 24, 32, 0.94);
@@ -1482,6 +1486,7 @@ th {
   justify-content: flex-end;
   gap: 10px;
   margin-bottom: 42px;
+  min-width: 0;
 }
 
 .pdf-button {
@@ -1543,6 +1548,7 @@ th {
 .report-project-links a {
   display: inline-flex;
   align-items: center;
+  min-width: 0;
   min-height: 34px;
   padding: 0 12px;
   border: 1px solid rgba(217, 210, 211, 0.22);
@@ -1552,6 +1558,7 @@ th {
   font-size: 0.82rem;
   font-weight: 800;
   text-decoration: none;
+  overflow-wrap: anywhere;
 }
 
 .report-project-links a:hover {
@@ -1571,9 +1578,11 @@ th {
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
   margin-top: 28px;
+  min-width: 0;
 }
 
 .report-metrics div {
+  min-width: 0;
   padding: 13px;
   border: 1px solid rgba(128, 38, 57, 0.36);
   border-radius: 8px;
@@ -1601,6 +1610,7 @@ th {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
+  min-width: 0;
 }
 
 .report-section {
@@ -1620,6 +1630,7 @@ th {
   margin: 0;
   color: #d8cfd2;
   line-height: 1.62;
+  overflow-wrap: anywhere;
 }
 
 .report-section p + p {
@@ -1638,6 +1649,7 @@ th {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 16px;
+  min-width: 0;
 }
 
 .algorithm-grid {
@@ -1645,9 +1657,11 @@ th {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 14px;
+  min-width: 0;
 }
 
 .algorithm-grid div {
+  min-width: 0;
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -1670,10 +1684,12 @@ th {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+  min-width: 0;
 }
 
 .checklist-grid div {
   position: relative;
+  min-width: 0;
   padding: 12px 12px 12px 34px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -1695,6 +1711,7 @@ th {
 }
 
 .heuristic-list div {
+  min-width: 0;
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -1704,6 +1721,7 @@ th {
 .command-list {
   display: grid;
   gap: 8px;
+  min-width: 0;
 }
 
 .command-list code {
@@ -1716,11 +1734,13 @@ th {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   margin-top: 12px;
+  min-width: 0;
 }
 
 .source-list a,
 .source-list div {
   display: block;
+  min-width: 0;
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 7px;
@@ -1735,6 +1755,7 @@ th {
   color: #ffffff;
   font-size: 0.86rem;
   line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .source-list span {
@@ -1744,6 +1765,7 @@ th {
   font-size: 0.76rem;
   font-weight: 600;
   line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .source-list a:hover {
@@ -1753,6 +1775,8 @@ th {
 .report-table-wrap {
   border: 1px solid var(--line);
   border-radius: 8px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .report-table-wrap table {
@@ -2057,7 +2081,7 @@ th {
     gap: 10px;
   }
 
-  .game-panel {
+  .app-shell .game-panel {
     display: grid;
     grid-template-columns: minmax(170px, 0.72fr) minmax(260px, 1.28fr);
     grid-template-areas:
@@ -2068,21 +2092,21 @@ th {
     padding: 10px;
   }
 
-  .top-bar {
+  .app-shell .top-bar {
     grid-area: header;
     align-items: stretch;
     flex-direction: column;
     gap: 8px;
   }
 
-  .top-actions {
+  .app-shell .top-actions {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
   }
 
-  .report-link,
-  .top-action-button {
+  .app-shell .report-link,
+  .app-shell .top-action-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -2092,15 +2116,15 @@ th {
     text-align: center;
   }
 
-  .eyebrow {
+  .app-shell .eyebrow {
     font-size: 0.68rem;
   }
 
-  h1 {
+  .app-shell h1 {
     font-size: clamp(1.9rem, 5.2vw, 3rem);
   }
 
-  .status {
+  .app-shell .status {
     grid-area: status;
     height: auto;
     min-height: 70px;
@@ -2110,30 +2134,30 @@ th {
     font-size: 0.88rem;
   }
 
-  .board-wrap {
+  .app-shell .board-wrap {
     grid-area: board;
     align-self: start;
     width: min(100%, calc((100dvh - 72px) * 7 / 6));
     padding-bottom: 0;
   }
 
-  .column-controls {
+  .app-shell .column-controls {
     margin-bottom: 7px;
     padding: 0 3px;
   }
 
-  .column-controls,
-  .board {
+  .app-shell .column-controls,
+  .app-shell .board {
     gap: clamp(4px, 0.8vw, 6px);
   }
 
-  .column-button {
+  .app-shell .column-button {
     min-height: 34px;
     border-radius: 7px;
     font-size: 0.84rem;
   }
 
-  .board {
+  .app-shell .board {
     padding: clamp(6px, 1vw, 8px);
     border-width: 4px;
     border-radius: 12px;
@@ -2144,8 +2168,80 @@ th {
       0 12px 22px rgba(0, 0, 0, 0.34);
   }
 
-  .side-panel {
+  .app-shell .side-panel {
     padding: 12px;
+  }
+}
+
+@media (max-width: 560px) {
+  .report-body .report-page {
+    width: 100%;
+    padding: 0 8px 28px;
+  }
+
+  .report-body .report-hero {
+    margin-bottom: 12px;
+    padding: 14px;
+    border-top-width: 5px;
+  }
+
+  .report-body .report-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .report-body .report-link,
+  .report-body .pdf-button {
+    width: auto;
+    min-height: 40px;
+    padding: 0 8px;
+    font-size: 0.9rem;
+  }
+
+  .report-body .report-hero h1 {
+    font-size: clamp(2rem, 12vw, 2.8rem);
+  }
+
+  .report-body .report-author {
+    line-height: 1.35;
+  }
+
+  .report-body .report-project-links {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .report-body .report-project-links a {
+    justify-content: center;
+    min-height: 36px;
+    text-align: center;
+  }
+
+  .report-body .report-lede {
+    font-size: 0.98rem;
+    line-height: 1.45;
+  }
+
+  .report-body .report-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .report-body .report-metrics div {
+    padding: 10px;
+  }
+
+  .report-body .report-grid {
+    gap: 12px;
+  }
+
+  .report-body .report-section {
+    padding: 14px;
   }
 }
 

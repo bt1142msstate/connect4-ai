@@ -57,6 +57,7 @@ select {
 
 .game-panel,
 .side-panel {
+  min-width: 0;
   background:
     linear-gradient(180deg, rgba(20, 31, 49, 0.92), rgba(12, 18, 30, 0.94)),
     var(--panel);
@@ -1758,7 +1759,7 @@ th {
   background: rgba(255, 255, 255, 0.035);
 }
 
-@media (max-width: 920px) {
+@media (max-width: 1024px) {
   .app-shell {
     width: min(760px, calc(100vw - 24px));
     grid-template-columns: 1fr;
@@ -2046,6 +2047,105 @@ th {
 
   .replay-actions {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 560px) {
+  .app-shell {
+    width: min(100vw - 16px, 1000px);
+    padding: 8px 0 12px;
+    gap: 10px;
+  }
+
+  .game-panel {
+    display: grid;
+    grid-template-columns: minmax(170px, 0.72fr) minmax(260px, 1.28fr);
+    grid-template-areas:
+      "header board"
+      "status board";
+    align-items: start;
+    gap: 10px 12px;
+    padding: 10px;
+  }
+
+  .top-bar {
+    grid-area: header;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .top-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .report-link,
+  .top-action-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 0 8px;
+    font-size: 0.82rem;
+    text-align: center;
+  }
+
+  .eyebrow {
+    font-size: 0.68rem;
+  }
+
+  h1 {
+    font-size: clamp(1.9rem, 5.2vw, 3rem);
+  }
+
+  .status {
+    grid-area: status;
+    height: auto;
+    min-height: 70px;
+    max-height: 110px;
+    margin: 0;
+    padding: 10px 12px;
+    font-size: 0.88rem;
+  }
+
+  .board-wrap {
+    grid-area: board;
+    align-self: start;
+    width: min(100%, calc((100dvh - 72px) * 7 / 6));
+    padding-bottom: 0;
+  }
+
+  .column-controls {
+    margin-bottom: 7px;
+    padding: 0 3px;
+  }
+
+  .column-controls,
+  .board {
+    gap: clamp(4px, 0.8vw, 6px);
+  }
+
+  .column-button {
+    min-height: 34px;
+    border-radius: 7px;
+    font-size: 0.84rem;
+  }
+
+  .board {
+    padding: clamp(6px, 1vw, 8px);
+    border-width: 4px;
+    border-radius: 12px;
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.22),
+      inset 0 -8px 14px rgba(4, 38, 70, 0.18),
+      0 7px 0 #031d35,
+      0 12px 22px rgba(0, 0, 0, 0.34);
+  }
+
+  .side-panel {
+    padding: 12px;
   }
 }
 

@@ -478,53 +478,53 @@ input:focus-visible {
 
 @keyframes drop-piece {
   0% {
-    transform: translate3d(0, var(--drop-start), 0) scale(0.985);
+    transform: translate3d(0, var(--drop-start), 0);
   }
 
   18% {
-    transform: translate3d(0, var(--drop-step-18), 0) scale(0.988);
+    transform: translate3d(0, var(--drop-step-18), 0);
   }
 
   35% {
-    transform: translate3d(0, var(--drop-step-35), 0) scale(0.992);
+    transform: translate3d(0, var(--drop-step-35), 0);
   }
 
   52% {
-    transform: translate3d(0, var(--drop-step-52), 0) scale(0.996);
+    transform: translate3d(0, var(--drop-step-52), 0);
   }
 
   68% {
-    transform: translate3d(0, var(--drop-step-68), 0) scale(0.998);
+    transform: translate3d(0, var(--drop-step-68), 0);
   }
 
   82% {
-    transform: translate3d(0, var(--drop-step-82), 0) scale(0.999);
+    transform: translate3d(0, var(--drop-step-82), 0);
   }
 
   93% {
-    transform: translate3d(0, var(--drop-step-93), 0) scale(1);
+    transform: translate3d(0, var(--drop-step-93), 0);
   }
 
   96% {
-    transform: translate3d(0, 0, 0) scale(1.018, 0.982);
+    transform: translate3d(0, 0, 0);
   }
 
   98% {
-    transform: translate3d(0, var(--drop-settle), 0) scale(0.992, 1.008);
+    transform: translate3d(0, var(--drop-settle), 0);
   }
 
   100% {
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: translate3d(0, 0, 0);
   }
 }
 
 @keyframes drop-piece-reduced {
   from {
-    transform: translate3d(0, var(--drop-start), 0) scale(0.995);
+    transform: translate3d(0, var(--drop-start), 0);
   }
 
   to {
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: translate3d(0, 0, 0);
   }
 }
 

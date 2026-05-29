@@ -223,7 +223,7 @@
         fallingPiece.style.setProperty("--drop-step-82", gravityStep(0.82));
         fallingPiece.style.setProperty("--drop-step-93", gravityStep(0.93));
         fallingPiece.style.setProperty("--drop-settle", `${-Math.max(2, Math.min(6, dropDistance * 0.012))}px`);
-        fallingPiece.style.transform = `translate3d(0, ${startOffset}px, 0) scale(0.985)`;
+        fallingPiece.style.transform = `translate3d(0, ${startOffset}px, 0)`;
         fallingPiece.getBoundingClientRect();
         fallingPiece.addEventListener("animationend", finish, { once: true });
         fallingPiece.classList.add(reduceMotion ? "css-drop-reduced" : "css-drop");

@@ -13,7 +13,7 @@
     getOpenRow
   } = engine;
 
-  const DROP_ANIMATION_MS = 300;
+  const DROP_ANIMATION_MS = 460;
 
   function createBoardUi(options = {}) {
     // The board UI never owns rules; it asks the controller for current state.
@@ -106,7 +106,7 @@
       const finalY = targetRect.top - boardRect.top - boardElement.clientTop;
       const fullDropStart = -(finalY + targetRect.height + 18);
       const startOffset = reduceMotion ? -Math.min(18, targetRect.height * 0.35) : fullDropStart;
-      const duration = reduceMotion ? 140 : DROP_ANIMATION_MS + row * 34;
+      const duration = reduceMotion ? 140 : DROP_ANIMATION_MS + row * 70;
 
       fallingPiece.className = `falling-piece ${player === HUMAN ? "red" : "yellow"}`;
       fallingPiece.style.width = `${targetRect.width}px`;

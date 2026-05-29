@@ -453,7 +453,7 @@ input:focus-visible {
 }
 
 .falling-piece.css-drop {
-  animation: drop-piece var(--drop-duration) cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: drop-piece var(--drop-duration) linear forwards;
 }
 
 .falling-piece.css-drop-reduced {

@@ -13,9 +13,10 @@
     getOpenRow
   } = engine;
 
-  const DROP_GRAVITY_PX_PER_MS2 = 0.00145;
-  const DROP_MIN_ANIMATION_MS = 320;
-  const DROP_MAX_ANIMATION_MS = 900;
+  const DROP_GRAVITY_PX_PER_MS2 = 0.00062;
+  const DROP_MOTION_EXPONENT = 1.55;
+  const DROP_MIN_ANIMATION_MS = 430;
+  const DROP_MAX_ANIMATION_MS = 1450;
 
   function createBoardUi(options = {}) {
     // The board UI never owns rules; it asks the controller for current state.
@@ -134,7 +135,9 @@
         };
 
         // Keep every browser on the CSS path so the drop feels consistent.
-        const gravityStep = (timeRatio) => `${startOffset * (1 - timeRatio * timeRatio)}px`;
+        const gravityStep = (timeRatio) => (
+          `${startOffset * (1 - Math.pow(timeRatio, DROP_MOTION_EXPONENT))}px`
+        );
         fallingPiece.style.setProperty("--drop-start", `${startOffset}px`);
         fallingPiece.style.setProperty("--drop-duration", `${duration}ms`);
         fallingPiece.style.setProperty("--drop-step-18", gravityStep(0.18));

@@ -13,10 +13,10 @@
     getOpenRow
   } = engine;
 
-  const DROP_GRAVITY_PX_PER_MS2 = 0.00132;
+  const DROP_GRAVITY_PX_PER_MS2 = 0.00528;
   const DROP_MOTION_EXPONENT = 1.45;
-  const DROP_MIN_ANIMATION_MS = 330;
-  const DROP_MAX_ANIMATION_MS = 1000;
+  const DROP_MIN_ANIMATION_MS = 165;
+  const DROP_MAX_ANIMATION_MS = 500;
 
   function createBoardUi(options = {}) {
     // The board UI never owns rules; it asks the controller for current state.

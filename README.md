@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A local browser-based Connect 4 game with a depth-limited minimax opponent, alpha-beta pruning, heuristic evaluation, AI move explanations, replay controls, optional sound effects, and headless validation.
+A local browser-based Connect 4 game with Player vs AI and local Two Player modes, a depth-limited minimax opponent, alpha-beta pruning, heuristic evaluation, AI move explanations, adjustable drop speed, replay controls, optional sound effects, and headless validation.
 
 Difficulty settings run from Easy depth 2 through Good Luck depth 8. Good Luck is the strongest practical browser setting in this project, not a mathematically solved Connect 4 oracle.
 
@@ -11,6 +11,8 @@ Difficulty settings run from Easy depth 2 through Good Luck depth 8. Good Luck i
 ## Run the Game
 
 Open `index.html` in a browser. No server or package install is required for gameplay.
+Use the Game Mode dropdown to choose Player vs AI or Two Player. In Player vs AI, red is manually controlled unless Autopilot is enabled, and yellow uses minimax. In Two Player, red and yellow are both controlled from the board or number buttons, and the AI-only controls are disabled.
+The Drop Speed slider controls the live drop animation from 0.5x to 2.0x, so the pieces can fall at a comfortable speed while still moving through the board slots.
 After a game ends, the side panel's Replay tab lets you scrub through every move, step backward or forward one move at a time, or play the whole game back at a selected speed. AI moves include the reason, depth, algorithm, nodes searched, score, and move time.
 Replay can animate each forward move dropping into the board, and the Replay tab includes a toggle to turn those animations off.
 Sound effects are generated in the browser, so no extra audio files are needed, and the Controls panel includes a sound toggle.
@@ -18,7 +20,7 @@ Use the How It Works button for an in-app walkthrough of the board model, rules,
 
 ## Report
 
-Open `report.html` for a short technical write-up. Use the Create PDF button to save a PDF through the browser print dialog.
+Open `report.html` for a short technical write-up. Use the Download PDF button to save a PDF through the browser print dialog.
 
 ## Optional Headless Validation
 
@@ -28,7 +30,7 @@ If Node.js is available, run:
 npm test
 ```
 
-The `npm test` script runs the same reusable headless runner used for local validation and GitHub Actions. It checks Connect 4 rules, invalid and full-column rejection, move ordering, win/draw detection, red minimizer behavior, depth-adjusted terminal scoring, alpha-beta consistency, tie variation, tactical shortcut behavior, and uneven-depth AI matchups.
+The `npm test` script runs the same reusable headless runner used for local validation and GitHub Actions. It checks Connect 4 rules, invalid and full-column rejection, move ordering, win/draw detection, red minimizer behavior, depth-adjusted terminal scoring, alpha-beta consistency, tie variation, tactical shortcut behavior, uneven-depth AI matchups, and the same engine paths used by the browser modes.
 
 Additional CLI evidence exports:
 

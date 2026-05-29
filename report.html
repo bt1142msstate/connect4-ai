@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Connect 4 AI Report</title>
+  <link rel="icon" href="assets/connect4-favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style/style.css">
 </head>
 <body class="report-body">
@@ -24,7 +25,8 @@
       </div>
       <p class="report-lede">
         I built a local browser game that demonstrates depth-limited minimax, alpha-beta pruning, heuristic
-        evaluation, adjustable difficulty, Autopilot, experiments, and headless testing.
+        evaluation, adjustable difficulty, local two-player play, adjustable drop speed, Autopilot, experiments,
+        and headless testing.
       </p>
 
       <div class="report-metrics" aria-label="Project summary">
@@ -51,12 +53,13 @@
       <article class="report-section span-2">
         <h2>What I Built</h2>
         <p>
-          I built a local browser-based Connect 4 game with a standard 7-column by 6-row board. Red is the
-          human side and yellow is the AI side. The app validates legal moves, prevents drops into full columns, applies
-          gravity to the lowest open row, detects horizontal, vertical, and both diagonal wins, detects natural draws,
-          and resets the game. It also includes red Autopilot with its own difficulty setting, a yellow AI opponent,
-          post-game replay controls with optional drop animations, an Experiment Lab, downloadable experiment results,
-          and a Node headless test runner.
+          I built a local browser-based Connect 4 game with a standard 7-column by 6-row board. In the default
+          Player vs AI mode, red is the human side and yellow is the AI side. A Game Mode selector can switch to local
+          Two Player mode, where both red and yellow are manually controlled from the same board and number buttons.
+          The app validates legal moves, prevents drops into full columns, applies gravity to the lowest open row,
+          detects horizontal, vertical, and both diagonal wins, detects natural draws, and resets the game. It also
+          includes red Autopilot with its own difficulty setting, adjustable live drop speed, post-game replay controls
+          with optional drop animations, an Experiment Lab, downloadable experiment results, and a Node headless test runner.
         </p>
       </article>
 
@@ -64,7 +67,9 @@
         <h2>Project Features</h2>
         <div class="checklist-grid">
           <div>Static site organized into game, style, and validation folders</div>
+          <div>Game Mode selector for Player vs AI or local Two Player play</div>
           <div>7 x 6 board with gravity drops, legal move checks, reset, wins, and draws</div>
+          <div>Adjustable live drop speed from 0.5x to 2.0x</div>
           <div>Depth-limited minimax with yellow maximizing and red minimizing</div>
           <div>Alpha-beta pruning with move, node, runtime, algorithm, and depth stats</div>
           <div>Heuristic scoring for wins, threats, open spaces, and center control</div>
@@ -81,7 +86,8 @@
         <p>
           The game runs by opening <code>index.html</code>; no server or internet connection is required. Source files are
           grouped into <code>game/</code> for gameplay and search, <code>style/</code> for the visual design, and
-          <code>checks/</code> for optional Node validation. The main validation command is
+          <code>checks/</code> for optional Node validation. The Controls panel selects Player vs AI or Two Player mode,
+          difficulty, alpha-beta pruning, sound, and drop speed. The main validation command is
           <code>node checks/headless-test.js</code>.
         </p>
       </article>

@@ -272,7 +272,7 @@
   }
 
   function experimentToCsv(result) {
-    // CSV output gives a simple artifact the report or grader can open in a spreadsheet.
+    // CSV output gives a simple artifact that opens cleanly in spreadsheet software.
     const rows = [["Section", "Name", "Algorithm", "Depth", "Nodes", "Time Seconds", "Move", "Score", "Result", "Notes"]];
     rows.push([
       "Experiment Config",

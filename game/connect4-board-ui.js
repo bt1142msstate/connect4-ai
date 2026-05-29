@@ -13,10 +13,10 @@
     getOpenRow
   } = engine;
 
-  const DROP_GRAVITY_PX_PER_MS2 = 0.00062;
-  const DROP_MOTION_EXPONENT = 1.55;
-  const DROP_MIN_ANIMATION_MS = 430;
-  const DROP_MAX_ANIMATION_MS = 1450;
+  const DROP_GRAVITY_PX_PER_MS2 = 0.00132;
+  const DROP_MOTION_EXPONENT = 1.45;
+  const DROP_MIN_ANIMATION_MS = 330;
+  const DROP_MAX_ANIMATION_MS = 1000;
 
   function createBoardUi(options = {}) {
     // The board UI never owns rules; it asks the controller for current state.
@@ -31,9 +31,83 @@
     const isExperimentLabOpen = options.isExperimentLabOpen ?? (() => false);
     const isWalkthroughOpen = options.isWalkthroughOpen ?? (() => false);
     const onHumanMove = options.onHumanMove ?? (() => {});
+    let boardResizeObserver = null;
 
     function isManualHumanTurn() {
       return !isRedAiEnabled() && getCurrentPlayer() === HUMAN && !getGameOver() && !getIsAiThinking();
+    }
+
+    function syncBoardFaceOverlay(boardElement) {
+      const cells = Array.from(boardElement.children).filter((child) => child.classList.contains("cell"));
+      if (cells.length !== ROWS * COLS) return;
+
+      boardElement.querySelector(".board-face-overlay")?.remove();
+
+      const boardRect = boardElement.getBoundingClientRect();
+      if (boardRect.width <= 0 || boardRect.height <= 0) return;
+
+      const styles = getComputedStyle(boardElement);
+      const boardLight = styles.getPropertyValue("--board-light").trim() || "#4ba3ff";
+      const boardColor = styles.getPropertyValue("--board").trim() || "#1d6fc5";
+      const svgNamespace = "http://www.w3.org/2000/svg";
+      const maskId = "board-face-mask";
+      const gradientId = "board-face-gradient";
+
+      const svg = document.createElementNS(svgNamespace, "svg");
+      svg.classList.add("board-face-overlay");
+      svg.setAttribute("viewBox", `0 0 ${boardRect.width} ${boardRect.height}`);
+      svg.setAttribute("aria-hidden", "true");
+      svg.setAttribute("focusable", "false");
+
+      const defs = document.createElementNS(svgNamespace, "defs");
+      const gradient = document.createElementNS(svgNamespace, "linearGradient");
+      gradient.setAttribute("id", gradientId);
+      gradient.setAttribute("x1", "0");
+      gradient.setAttribute("y1", "0");
+      gradient.setAttribute("x2", "0");
+      gradient.setAttribute("y2", "1");
+
+      const topStop = document.createElementNS(svgNamespace, "stop");
+      topStop.setAttribute("offset", "0%");
+      topStop.setAttribute("stop-color", boardLight);
+      const bottomStop = document.createElementNS(svgNamespace, "stop");
+      bottomStop.setAttribute("offset", "100%");
+      bottomStop.setAttribute("stop-color", boardColor);
+      gradient.append(topStop, bottomStop);
+
+      const mask = document.createElementNS(svgNamespace, "mask");
+      mask.setAttribute("id", maskId);
+      mask.setAttribute("maskUnits", "userSpaceOnUse");
+      const maskBase = document.createElementNS(svgNamespace, "rect");
+      maskBase.setAttribute("width", String(boardRect.width));
+      maskBase.setAttribute("height", String(boardRect.height));
+      maskBase.setAttribute("fill", "white");
+      mask.appendChild(maskBase);
+
+      cells.forEach((cell) => {
+        const cellRect = cell.getBoundingClientRect();
+        const hole = document.createElementNS(svgNamespace, "circle");
+        hole.setAttribute("cx", String(cellRect.left - boardRect.left + cellRect.width / 2));
+        hole.setAttribute("cy", String(cellRect.top - boardRect.top + cellRect.height / 2));
+        hole.setAttribute("r", String(Math.min(cellRect.width, cellRect.height) * 0.43));
+        hole.setAttribute("fill", "black");
+        mask.appendChild(hole);
+      });
+
+      defs.append(gradient, mask);
+      const face = document.createElementNS(svgNamespace, "rect");
+      face.setAttribute("width", String(boardRect.width));
+      face.setAttribute("height", String(boardRect.height));
+      face.setAttribute("fill", `url(#${gradientId})`);
+      face.setAttribute("mask", `url(#${maskId})`);
+      svg.append(defs, face);
+      boardElement.appendChild(svg);
+    }
+
+    function observeBoardFace(boardElement) {
+      if (boardResizeObserver || typeof ResizeObserver !== "function") return;
+      boardResizeObserver = new ResizeObserver(() => syncBoardFaceOverlay(boardElement));
+      boardResizeObserver.observe(boardElement);
     }
 
     function getGhostRow() {
@@ -87,6 +161,8 @@
         }
       }
 
+      syncBoardFaceOverlay(boardElement);
+      observeBoardFace(boardElement);
       updateColumnButtons();
     }
 

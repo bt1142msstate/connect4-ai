@@ -616,6 +616,31 @@ select option {
   margin-top: 2px;
 }
 
+.speed-field {
+  margin-bottom: 4px;
+}
+
+.speed-slider {
+  width: 100%;
+  accent-color: var(--felt);
+  cursor: pointer;
+}
+
+.speed-label-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.speed-label-row strong {
+  color: var(--ink);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 .switch-row {
   position: relative;
   display: grid;

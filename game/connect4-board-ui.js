@@ -30,6 +30,7 @@
     const isRedAiEnabled = options.isRedAiEnabled ?? (() => false);
     const isExperimentLabOpen = options.isExperimentLabOpen ?? (() => false);
     const isWalkthroughOpen = options.isWalkthroughOpen ?? (() => false);
+    const getDropSpeedMultiplier = options.getDropSpeedMultiplier ?? (() => 1);
     const onHumanMove = options.onHumanMove ?? (() => {});
     let boardResizeObserver = null;
 
@@ -187,9 +188,14 @@
       const startOffset = reduceMotion ? -Math.min(18, targetRect.height * 0.35) : fullDropStart;
       const dropDistance = Math.abs(startOffset);
       const gravityDuration = Math.sqrt((2 * dropDistance) / DROP_GRAVITY_PX_PER_MS2);
+      const rawSpeedMultiplier = Number(getDropSpeedMultiplier());
+      const speedMultiplier = Number.isFinite(rawSpeedMultiplier)
+        ? Math.max(0.5, Math.min(2, rawSpeedMultiplier))
+        : 1;
+      const baseDuration = Math.round(Math.max(DROP_MIN_ANIMATION_MS, Math.min(DROP_MAX_ANIMATION_MS, gravityDuration)));
       const duration = reduceMotion
         ? 140
-        : Math.round(Math.max(DROP_MIN_ANIMATION_MS, Math.min(DROP_MAX_ANIMATION_MS, gravityDuration)));
+        : Math.round(baseDuration / speedMultiplier);
 
       fallingPiece.className = `falling-piece ${player === HUMAN ? "red" : "yellow"}`;
       fallingPiece.style.width = `${targetRect.width}px`;

@@ -385,6 +385,45 @@ function createReportPdf() {
   window.open("report.html?print=1", "_blank", "noopener");
 }
 
+function getDropSpeedMultiplier() {
+  const control = document.getElementById("dropSpeed");
+  if (!control) return 1;
+  const value = Number(control.value);
+  return Number.isFinite(value) ? Math.max(0.5, Math.min(2, value)) : 1;
+}
+
+function formatDropSpeed(value) {
+  return Number.isInteger(value)
+    ? `${value.toFixed(1)}x`
+    : `${value.toFixed(2).replace(/0$/, "")}x`;
+}
+
+function updateDropSpeedLabel() {
+  const label = document.getElementById("dropSpeedLabel");
+  if (label) {
+    label.textContent = formatDropSpeed(getDropSpeedMultiplier());
+  }
+}
+
+function handleDropSpeedKeyboard(event) {
+  const control = event.currentTarget;
+  const step = Number(control.step) || 0.25;
+  const min = Number(control.min) || 0.5;
+  const max = Number(control.max) || 2;
+  const current = Number(control.value) || 1;
+  let next = current;
+
+  if (event.key === "ArrowLeft" || event.key === "ArrowDown") next = current - step;
+  if (event.key === "ArrowRight" || event.key === "ArrowUp") next = current + step;
+  if (event.key === "Home") next = min;
+  if (event.key === "End") next = max;
+  if (next === current) return;
+
+  event.preventDefault();
+  control.value = String(Math.max(min, Math.min(max, next)));
+  updateDropSpeedLabel();
+}
+
 function initBrowserGame() {
   soundController = Connect4Sound ? Connect4Sound.createSoundController({ enabledControlId: "soundEnabled" }) : null;
   if (soundController) soundController.bindUnlockEvents(document);
@@ -398,6 +437,7 @@ function initBrowserGame() {
     isRedAiEnabled,
     isExperimentLabOpen,
     isWalkthroughOpen,
+    getDropSpeedMultiplier,
     onHumanMove: handleHumanMove
   });
   experimentLab = Connect4ExperimentUi.createExperimentLab({
@@ -434,6 +474,10 @@ function initBrowserGame() {
   document.getElementById("resetButton").addEventListener("click", resetGame);
   document.getElementById("redAiEnabled").addEventListener("change", handleRedAiToggle);
   document.getElementById("showStats").addEventListener("change", toggleStats);
+  document.getElementById("dropSpeed").addEventListener("input", updateDropSpeedLabel);
+  document.getElementById("dropSpeed").addEventListener("change", updateDropSpeedLabel);
+  document.getElementById("dropSpeed").addEventListener("keydown", handleDropSpeedKeyboard);
+  updateDropSpeedLabel();
   document.getElementById("createPdfButton").addEventListener("click", createReportPdf);
   document.getElementById("openWalkthroughButton").addEventListener("click", openWalkthrough);
   document.getElementById("closeWalkthroughButton").addEventListener("click", closeWalkthrough);

@@ -28,6 +28,7 @@
     const getGameOver = options.getGameOver ?? (() => false);
     const getIsAiThinking = options.getIsAiThinking ?? (() => false);
     const isRedAiEnabled = options.isRedAiEnabled ?? (() => false);
+    const isTwoPlayerMode = options.isTwoPlayerMode ?? (() => false);
     const isExperimentLabOpen = options.isExperimentLabOpen ?? (() => false);
     const isWalkthroughOpen = options.isWalkthroughOpen ?? (() => false);
     const getDropSpeedMultiplier = options.getDropSpeedMultiplier ?? (() => 1);
@@ -35,7 +36,9 @@
     let boardResizeObserver = null;
 
     function isManualHumanTurn() {
-      return !isRedAiEnabled() && getCurrentPlayer() === HUMAN && !getGameOver() && !getIsAiThinking();
+      if (getGameOver() || getIsAiThinking()) return false;
+      if (isTwoPlayerMode()) return true;
+      return !isRedAiEnabled() && getCurrentPlayer() === HUMAN;
     }
 
     function syncBoardFaceOverlay(boardElement) {
@@ -121,6 +124,8 @@
       if (!boardElement) return;
       const manualTurn = isManualHumanTurn();
       boardElement.classList.toggle("manual-drop-turn", manualTurn);
+      boardElement.classList.toggle("red-turn", manualTurn && getCurrentPlayer() === HUMAN);
+      boardElement.classList.toggle("yellow-turn", manualTurn && getCurrentPlayer() === AI);
       document.querySelector(".game-panel")?.classList.toggle("manual-drop-turn", manualTurn);
       document.getElementById("columnControls")?.classList.toggle("manual-drop-turn", manualTurn);
     }
@@ -135,6 +140,9 @@
       const hiddenCell = renderOptions.hiddenCell ? `${renderOptions.hiddenCell.row},${renderOptions.hiddenCell.col}` : null;
       const ghostRow = getGhostRow();
       const manualTurn = isManualHumanTurn();
+      const currentPlayer = getCurrentPlayer();
+      const ghostColor = currentPlayer === HUMAN ? "red" : "yellow";
+      const ghostLabel = currentPlayer === HUMAN ? "red" : "yellow";
 
       for (let row = 0; row < ROWS; row += 1) {
         for (let col = 0; col < COLS; col += 1) {
@@ -147,8 +155,8 @@
             if (board[row][col] === HUMAN) cell.classList.add("red");
             if (board[row][col] === AI) cell.classList.add("yellow");
             if (row === ghostRow && col === hoverColumn && board[row][col] === EMPTY) {
-              cell.classList.add("ghost", "red");
-              cell.setAttribute("aria-label", `Preview red piece in column ${col + 1}`);
+              cell.classList.add("ghost", ghostColor);
+              cell.setAttribute("aria-label", `Preview ${ghostLabel} piece in column ${col + 1}`);
             }
           }
           if (manualTurn && board[0][col] === EMPTY) {
@@ -281,8 +289,9 @@
       syncBoardInteractivity();
       const board = getBoard();
       const buttons = document.querySelectorAll(".column-button");
+      const manualTurn = isManualHumanTurn();
       buttons.forEach((button, col) => {
-        button.disabled = isRedAiEnabled() || getGameOver() || getIsAiThinking() || getCurrentPlayer() !== HUMAN || board[0][col] !== EMPTY;
+        button.disabled = !manualTurn || board[0][col] !== EMPTY;
         button.classList.toggle("hover-preview", hoverColumn === col && !button.disabled);
       });
     }

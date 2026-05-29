@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Connect 4 AI</title>
-  <link rel="stylesheet" href="style/style.css">
+  <link rel="stylesheet" href="style/style.css?v=20260529-2">
 </head>
 <body>
   <main class="app-shell">
@@ -40,6 +40,14 @@
         <h2>Controls</h2>
         <div class="control-card">
           <label class="field">
+            <span>Game Mode</span>
+            <select id="gameMode">
+              <option value="ai" selected>Player vs AI</option>
+              <option value="two-player">Two Player</option>
+            </select>
+          </label>
+
+          <label class="field" data-ai-setting>
             <span>Yellow AI</span>
             <select id="difficulty">
               <option value="2">Easy: depth 2</option>
@@ -51,7 +59,7 @@
           </label>
         </div>
 
-        <div class="control-card accent-card">
+        <div class="control-card accent-card" data-ai-setting>
           <label class="switch-row">
             <span>
               <strong>Autopilot</strong>
@@ -74,7 +82,7 @@
         </div>
 
         <div class="control-card">
-          <label class="toggle">
+          <label class="toggle" data-ai-setting>
             <input type="checkbox" id="useAlphaBeta" checked>
             <span>Alpha-beta pruning</span>
           </label>
@@ -514,12 +522,12 @@ function runHeadlessSuite(options = {}) {
     </section>
   </div>
 
-  <script src="game/connect4-engine.js?v=20260529"></script>
-  <script src="game/connect4-experiment.js?v=20260529"></script>
-  <script src="game/connect4-experiment-ui.js?v=20260529"></script>
-  <script src="game/connect4-replay-ui.js?v=20260529"></script>
-  <script src="game/connect4-board-ui.js?v=20260529"></script>
-  <script src="game/connect4-sound.js?v=20260529"></script>
-  <script src="game/connect4-game-controller.js?v=20260529"></script>
+  <script src="game/connect4-engine.js?v=20260529-2"></script>
+  <script src="game/connect4-experiment.js?v=20260529-2"></script>
+  <script src="game/connect4-experiment-ui.js?v=20260529-2"></script>
+  <script src="game/connect4-replay-ui.js?v=20260529-2"></script>
+  <script src="game/connect4-board-ui.js?v=20260529-2"></script>
+  <script src="game/connect4-sound.js?v=20260529-2"></script>
+  <script src="game/connect4-game-controller.js?v=20260529-2"></script>
 </body>
 </html>

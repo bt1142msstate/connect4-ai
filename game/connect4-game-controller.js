@@ -125,27 +125,44 @@ function updateColumnButtons() {
   if (boardUi) boardUi.updateColumnButtons();
 }
 
+function isTwoPlayerMode() {
+  const mode = document.getElementById("gameMode");
+  return Boolean(mode && mode.value === "two-player");
+}
+
+function isManualTurn() {
+  if (gameOver || isAiThinking || board[0].every((cell) => cell !== EMPTY)) return false;
+  if (isTwoPlayerMode()) return true;
+  return currentPlayer === HUMAN && !isRedAiEnabled();
+}
+
 async function handleHumanMove(col) {
-  // Manual input is accepted only during a playable Red turn and only in open columns.
-  if (isRedAiEnabled() || currentPlayer !== HUMAN || gameOver || isAiThinking || board[0][col] !== EMPTY) {
+  // Manual input is accepted during human-controlled turns and only in open columns.
+  if (!isManualTurn() || board[0][col] !== EMPTY) {
     return;
   }
 
   isAiThinking = true;
   if (boardUi) boardUi.clearHoverColumn({ render: false });
   const activeToken = moveToken;
-  const row = dropPiece(board, col, HUMAN);
-  recordMove(row, col, HUMAN);
-  setStatus("Dropping red piece...");
+  const player = currentPlayer;
+  const playerName = player === HUMAN ? "red" : "yellow";
+  const row = dropPiece(board, col, player);
+  recordMove(row, col, player);
+  setStatus(`Dropping ${playerName} piece...`);
   renderBoard({ hiddenCell: { row, col } });
-  await animateDrop(row, col, HUMAN);
+  await animateDrop(row, col, player);
   if (activeToken !== moveToken) return;
-  playDropSound(HUMAN);
+  playDropSound(player);
 
-  const humanWin = checkWin(board, HUMAN);
-  if (humanWin.won) {
-    playWinSound(HUMAN);
-    finishGame("You win. Red connected four.", humanWin.cells);
+  const playerWin = checkWin(board, player);
+  if (playerWin.won) {
+    playWinSound(player);
+    if (isTwoPlayerMode()) {
+      finishGame(`${player === HUMAN ? "Red" : "Yellow"} wins. ${player === HUMAN ? "Red" : "Yellow"} connected four.`, playerWin.cells);
+    } else {
+      finishGame("You win. Red connected four.", playerWin.cells);
+    }
     return;
   }
 
@@ -155,12 +172,15 @@ async function handleHumanMove(col) {
     return;
   }
 
-  currentPlayer = AI;
+  currentPlayer = currentPlayer === HUMAN ? AI : HUMAN;
+  isAiThinking = false;
   renderBoard();
   setStatus(getTurnStatus());
   updateColumnButtons();
 
-  window.setTimeout(() => makeComputerMove(activeToken), 70);
+  if (shouldComputerPlayCurrentTurn()) {
+    scheduleComputerMove(activeToken);
+  }
 }
 
 async function makeComputerMove(activeToken = moveToken) {
@@ -254,6 +274,7 @@ function resetGame() {
 }
 
 function isRedAiEnabled() {
+  if (isTwoPlayerMode()) return false;
   const redAiEnabled = document.getElementById("redAiEnabled");
   return Boolean(redAiEnabled && redAiEnabled.checked);
 }
@@ -269,7 +290,7 @@ function getSearchDepthForPlayer(player, useAlphaBeta) {
 }
 
 function shouldComputerPlayCurrentTurn() {
-  return !gameOver && (currentPlayer === AI || (currentPlayer === HUMAN && isRedAiEnabled()));
+  return !isTwoPlayerMode() && !gameOver && (currentPlayer === AI || (currentPlayer === HUMAN && isRedAiEnabled()));
 }
 
 function getTurnStatus() {
@@ -280,7 +301,11 @@ function getTurnStatus() {
   const opponentWins = getImmediateWinningMoves(board, opponent);
 
   if (currentPlayer === HUMAN) {
-    const base = isRedAiEnabled() ? "Red AI is thinking." : "Your turn.";
+    const base = isTwoPlayerMode()
+      ? "Red player's turn."
+      : isRedAiEnabled()
+        ? "Red AI is thinking."
+        : "Your turn.";
     if (currentWins.length > 0) {
       return `${base} Winning move available in column ${formatColumns(currentWins)}.`;
     }
@@ -290,7 +315,21 @@ function getTurnStatus() {
     if (opponentWins.length === 1) {
       return `${base} Warning: block Yellow's winning threat in column ${formatColumns(opponentWins)}.`;
     }
+    if (isTwoPlayerMode()) return "Red player's turn. Drop a red piece.";
     return isRedAiEnabled() ? "Red AI is thinking..." : "Your turn. Drop a red piece.";
+  }
+
+  if (isTwoPlayerMode()) {
+    if (currentWins.length > 0) {
+      return `Yellow player's turn. Winning move available in column ${formatColumns(currentWins)}.`;
+    }
+    if (opponentWins.length > 1) {
+      return `Yellow player's turn. Unavoidable threat: Red can win next turn in columns ${formatColumns(opponentWins)}.`;
+    }
+    if (opponentWins.length === 1) {
+      return `Yellow player's turn. Warning: block Red's winning threat in column ${formatColumns(opponentWins)}.`;
+    }
+    return "Yellow player's turn. Drop a yellow piece.";
   }
 
   if (currentWins.length > 0) {
@@ -323,6 +362,12 @@ function clearPendingComputerMove() {
 }
 
 function handleRedAiToggle() {
+  if (isTwoPlayerMode()) {
+    document.getElementById("redAiEnabled").checked = false;
+    updateModeControls();
+    return;
+  }
+
   if (gameOver) {
     updateColumnButtons();
     return;
@@ -341,9 +386,33 @@ function handleRedAiToggle() {
   }
 }
 
+function updateModeControls() {
+  const twoPlayer = isTwoPlayerMode();
+  const redAiToggle = document.getElementById("redAiEnabled");
+  const redDifficulty = document.getElementById("redDifficulty");
+  const yellowDifficulty = document.getElementById("difficulty");
+  const alphaBeta = document.getElementById("useAlphaBeta");
+
+  if (twoPlayer && redAiToggle) redAiToggle.checked = false;
+  [redAiToggle, redDifficulty, yellowDifficulty, alphaBeta].forEach((control) => {
+    if (control) control.disabled = twoPlayer;
+  });
+  document.querySelectorAll("[data-ai-setting]").forEach((element) => {
+    element.classList.toggle("is-disabled", twoPlayer);
+  });
+  toggleStats();
+}
+
+function handleGameModeChange() {
+  clearPendingComputerMove();
+  isAiThinking = false;
+  updateModeControls();
+  resetGame();
+}
+
 function toggleStats() {
   const statsPanel = document.getElementById("statsPanel");
-  statsPanel.hidden = !document.getElementById("showStats").checked;
+  statsPanel.hidden = isTwoPlayerMode() || !document.getElementById("showStats").checked;
 }
 
 function closeExperimentLab() {
@@ -435,6 +504,7 @@ function initBrowserGame() {
     getGameOver: () => gameOver,
     getIsAiThinking: () => isAiThinking,
     isRedAiEnabled,
+    isTwoPlayerMode,
     isExperimentLabOpen,
     isWalkthroughOpen,
     getDropSpeedMultiplier,
@@ -472,6 +542,7 @@ function initBrowserGame() {
   document.addEventListener("keydown", handleExperimentKeydown);
 
   document.getElementById("resetButton").addEventListener("click", resetGame);
+  document.getElementById("gameMode").addEventListener("change", handleGameModeChange);
   document.getElementById("redAiEnabled").addEventListener("change", handleRedAiToggle);
   document.getElementById("showStats").addEventListener("change", toggleStats);
   document.getElementById("dropSpeed").addEventListener("input", updateDropSpeedLabel);
@@ -501,6 +572,7 @@ function initBrowserGame() {
       ? "Minimax + Alpha-Beta"
       : "Plain Minimax";
   });
+  updateModeControls();
 }
 
 if (typeof document !== "undefined") {

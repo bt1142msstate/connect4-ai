@@ -95,7 +95,7 @@
 
       const reduceMotion = typeof window.matchMedia === "function"
         && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (!targetCell || reduceMotion) {
+      if (!targetCell) {
         return Promise.resolve();
       }
 
@@ -104,8 +104,9 @@
       const fallingPiece = document.createElement("div");
       const finalX = targetRect.left - boardRect.left - boardElement.clientLeft;
       const finalY = targetRect.top - boardRect.top - boardElement.clientTop;
-      const startOffset = -(finalY + targetRect.height + 18);
-      const duration = DROP_ANIMATION_MS + row * 34;
+      const fullDropStart = -(finalY + targetRect.height + 18);
+      const startOffset = reduceMotion ? -Math.min(18, targetRect.height * 0.35) : fullDropStart;
+      const duration = reduceMotion ? 140 : DROP_ANIMATION_MS + row * 34;
 
       fallingPiece.className = `falling-piece ${player === HUMAN ? "red" : "yellow"}`;
       fallingPiece.style.width = `${targetRect.width}px`;
@@ -116,31 +117,24 @@
       boardElement.appendChild(fallingPiece);
 
       return new Promise((resolve) => {
+        let didFinish = false;
+        let fallbackTimer = null;
         const finish = () => {
+          if (didFinish) return;
+          didFinish = true;
+          if (fallbackTimer !== null) window.clearTimeout(fallbackTimer);
           fallingPiece.remove();
           resolve();
         };
 
-        if (typeof fallingPiece.animate === "function") {
-          const animation = fallingPiece.animate(
-            [
-              { transform: `translate3d(0, ${startOffset}px, 0)` },
-              { transform: "translate3d(0, 0, 0)" }
-            ],
-            {
-              duration,
-              easing: "cubic-bezier(0.16, 1, 0.3, 1)",
-              fill: "forwards"
-            }
-          );
-          animation.addEventListener("finish", finish, { once: true });
-          return;
-        }
-
+        // Keep every browser on the CSS path so the drop feels consistent.
         fallingPiece.style.setProperty("--drop-start", `${startOffset}px`);
         fallingPiece.style.setProperty("--drop-duration", `${duration}ms`);
-        fallingPiece.classList.add("css-drop");
-        window.setTimeout(finish, duration);
+        fallingPiece.style.transform = `translate3d(0, ${startOffset}px, 0) scale(0.985)`;
+        fallingPiece.getBoundingClientRect();
+        fallingPiece.addEventListener("animationend", finish, { once: true });
+        fallingPiece.classList.add(reduceMotion ? "css-drop-reduced" : "css-drop");
+        fallbackTimer = window.setTimeout(finish, duration + 90);
       });
     }
 

@@ -456,12 +456,35 @@ input:focus-visible {
   animation: drop-piece var(--drop-duration) cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+.falling-piece.css-drop-reduced {
+  animation: drop-piece-reduced var(--drop-duration) ease-out forwards;
+}
+
 @keyframes drop-piece {
-  from {
-    transform: translate3d(0, var(--drop-start), 0);
+  0% {
+    transform: translate3d(0, var(--drop-start), 0) scale(0.985);
   }
+
+  82% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  91% {
+    transform: translate3d(0, -6px, 0) scale(1.012, 0.988);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes drop-piece-reduced {
+  from {
+    transform: translate3d(0, var(--drop-start), 0) scale(0.995);
+  }
+
   to {
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 

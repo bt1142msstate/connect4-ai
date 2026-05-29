@@ -465,12 +465,36 @@ input:focus-visible {
     transform: translate3d(0, var(--drop-start), 0) scale(0.985);
   }
 
-  82% {
-    transform: translate3d(0, 0, 0) scale(1);
+  18% {
+    transform: translate3d(0, var(--drop-step-18), 0) scale(0.988);
   }
 
-  91% {
-    transform: translate3d(0, -6px, 0) scale(1.012, 0.988);
+  35% {
+    transform: translate3d(0, var(--drop-step-35), 0) scale(0.992);
+  }
+
+  52% {
+    transform: translate3d(0, var(--drop-step-52), 0) scale(0.996);
+  }
+
+  68% {
+    transform: translate3d(0, var(--drop-step-68), 0) scale(0.998);
+  }
+
+  82% {
+    transform: translate3d(0, var(--drop-step-82), 0) scale(0.999);
+  }
+
+  93% {
+    transform: translate3d(0, var(--drop-step-93), 0) scale(1);
+  }
+
+  96% {
+    transform: translate3d(0, 0, 0) scale(1.018, 0.982);
+  }
+
+  98% {
+    transform: translate3d(0, var(--drop-settle), 0) scale(0.992, 1.008);
   }
 
   100% {

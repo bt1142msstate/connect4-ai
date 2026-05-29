@@ -13,7 +13,9 @@
     getOpenRow
   } = engine;
 
-  const DROP_ANIMATION_MS = 460;
+  const DROP_GRAVITY_PX_PER_MS2 = 0.00145;
+  const DROP_MIN_ANIMATION_MS = 320;
+  const DROP_MAX_ANIMATION_MS = 900;
 
   function createBoardUi(options = {}) {
     // The board UI never owns rules; it asks the controller for current state.
@@ -106,7 +108,11 @@
       const finalY = targetRect.top - boardRect.top - boardElement.clientTop;
       const fullDropStart = -(finalY + targetRect.height + 18);
       const startOffset = reduceMotion ? -Math.min(18, targetRect.height * 0.35) : fullDropStart;
-      const duration = reduceMotion ? 140 : DROP_ANIMATION_MS + row * 70;
+      const dropDistance = Math.abs(startOffset);
+      const gravityDuration = Math.sqrt((2 * dropDistance) / DROP_GRAVITY_PX_PER_MS2);
+      const duration = reduceMotion
+        ? 140
+        : Math.round(Math.max(DROP_MIN_ANIMATION_MS, Math.min(DROP_MAX_ANIMATION_MS, gravityDuration)));
 
       fallingPiece.className = `falling-piece ${player === HUMAN ? "red" : "yellow"}`;
       fallingPiece.style.width = `${targetRect.width}px`;
@@ -128,8 +134,16 @@
         };
 
         // Keep every browser on the CSS path so the drop feels consistent.
+        const gravityStep = (timeRatio) => `${startOffset * (1 - timeRatio * timeRatio)}px`;
         fallingPiece.style.setProperty("--drop-start", `${startOffset}px`);
         fallingPiece.style.setProperty("--drop-duration", `${duration}ms`);
+        fallingPiece.style.setProperty("--drop-step-18", gravityStep(0.18));
+        fallingPiece.style.setProperty("--drop-step-35", gravityStep(0.35));
+        fallingPiece.style.setProperty("--drop-step-52", gravityStep(0.52));
+        fallingPiece.style.setProperty("--drop-step-68", gravityStep(0.68));
+        fallingPiece.style.setProperty("--drop-step-82", gravityStep(0.82));
+        fallingPiece.style.setProperty("--drop-step-93", gravityStep(0.93));
+        fallingPiece.style.setProperty("--drop-settle", `${-Math.max(2, Math.min(6, dropDistance * 0.012))}px`);
         fallingPiece.style.transform = `translate3d(0, ${startOffset}px, 0) scale(0.985)`;
         fallingPiece.getBoundingClientRect();
         fallingPiece.addEventListener("animationend", finish, { once: true });

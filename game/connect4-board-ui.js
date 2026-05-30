@@ -230,6 +230,23 @@
         const gravityStep = (timeRatio) => (
           `${startOffset * (1 - Math.pow(timeRatio, DROP_MOTION_EXPONENT))}px`
         );
+        const keyframes = reduceMotion
+          ? [
+              { transform: `translate3d(0, ${startOffset}px, 0)` },
+              { transform: "translate3d(0, 0, 0)" }
+            ]
+          : [
+              { transform: `translate3d(0, ${startOffset}px, 0)`, offset: 0 },
+              { transform: `translate3d(0, ${gravityStep(0.18)}, 0)`, offset: 0.18 },
+              { transform: `translate3d(0, ${gravityStep(0.35)}, 0)`, offset: 0.35 },
+              { transform: `translate3d(0, ${gravityStep(0.52)}, 0)`, offset: 0.52 },
+              { transform: `translate3d(0, ${gravityStep(0.68)}, 0)`, offset: 0.68 },
+              { transform: `translate3d(0, ${gravityStep(0.82)}, 0)`, offset: 0.82 },
+              { transform: `translate3d(0, ${gravityStep(0.93)}, 0)`, offset: 0.93 },
+              { transform: "translate3d(0, 0, 0)", offset: 0.96 },
+              { transform: `translate3d(0, ${-Math.max(2, Math.min(6, dropDistance * 0.012))}px, 0)`, offset: 0.98 },
+              { transform: "translate3d(0, 0, 0)", offset: 1 }
+            ];
         fallingPiece.style.setProperty("--drop-start", `${startOffset}px`);
         fallingPiece.style.setProperty("--drop-duration", `${duration}ms`);
         fallingPiece.style.setProperty("--drop-step-18", gravityStep(0.18));
@@ -239,10 +256,23 @@
         fallingPiece.style.setProperty("--drop-step-82", gravityStep(0.82));
         fallingPiece.style.setProperty("--drop-step-93", gravityStep(0.93));
         fallingPiece.style.setProperty("--drop-settle", `${-Math.max(2, Math.min(6, dropDistance * 0.012))}px`);
+        fallingPiece.dataset.dropDuration = String(duration);
         fallingPiece.style.transform = `translate3d(0, ${startOffset}px, 0)`;
         fallingPiece.getBoundingClientRect();
-        fallingPiece.addEventListener("animationend", finish, { once: true });
-        fallingPiece.classList.add(reduceMotion ? "css-drop-reduced" : "css-drop");
+        if (typeof fallingPiece.animate === "function") {
+          const dropAnimation = fallingPiece.animate(keyframes, {
+            duration,
+            easing: reduceMotion ? "ease-out" : "linear",
+            fill: "forwards"
+          });
+          dropAnimation.addEventListener("finish", finish, { once: true });
+          if (dropAnimation.finished) {
+            dropAnimation.finished.catch(() => finish());
+          }
+        } else {
+          fallingPiece.addEventListener("animationend", finish, { once: true });
+          fallingPiece.classList.add(reduceMotion ? "css-drop-reduced" : "css-drop");
+        }
         fallbackTimer = window.setTimeout(finish, duration + 90);
       });
     }

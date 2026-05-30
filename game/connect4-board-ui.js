@@ -13,8 +13,8 @@
     getOpenRow
   } = engine;
 
-  const DROP_GRAVITY_PX_PER_MS2 = 0.00528;
   const DROP_MOTION_EXPONENT = 1.45;
+  const DROP_BOTTOM_ROW_MS = 480;
   const DROP_MIN_ANIMATION_MS = 165;
   const DROP_MAX_ANIMATION_MS = 500;
 
@@ -195,12 +195,14 @@
       const fullDropStart = -(finalY + targetRect.height + 18);
       const startOffset = reduceMotion ? -Math.min(18, targetRect.height * 0.35) : fullDropStart;
       const dropDistance = Math.abs(startOffset);
-      const gravityDuration = Math.sqrt((2 * dropDistance) / DROP_GRAVITY_PX_PER_MS2);
+      const normalizedDropRows = row + 1.35;
+      const normalizedBottomRows = ROWS + 0.35;
+      const rowBasedDuration = DROP_BOTTOM_ROW_MS * Math.sqrt(normalizedDropRows / normalizedBottomRows);
       const rawSpeedMultiplier = Number(getDropSpeedMultiplier());
       const speedMultiplier = Number.isFinite(rawSpeedMultiplier)
         ? Math.max(0.5, Math.min(2, rawSpeedMultiplier))
         : 1;
-      const baseDuration = Math.round(Math.max(DROP_MIN_ANIMATION_MS, Math.min(DROP_MAX_ANIMATION_MS, gravityDuration)));
+      const baseDuration = Math.round(Math.max(DROP_MIN_ANIMATION_MS, Math.min(DROP_MAX_ANIMATION_MS, rowBasedDuration)));
       const duration = reduceMotion
         ? 140
         : Math.round(baseDuration / speedMultiplier);
@@ -224,7 +226,7 @@
           resolve();
         };
 
-        // Keep every browser on the CSS path so the drop feels consistent.
+        // Duration is based on board rows instead of pixels so browser zoom and screen size do not change perceived speed.
         const gravityStep = (timeRatio) => (
           `${startOffset * (1 - Math.pow(timeRatio, DROP_MOTION_EXPONENT))}px`
         );
